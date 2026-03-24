@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>桥韵中华 - 智能导游</title>
+    <link rel="stylesheet" href="./css/chat.css">
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=4SUebN2E7NWBi4iqtDOcnsgkkXkpDcP7"></script>
+</head>
+<body>
+    <nav>
+        <div class="nav-links">
+            <a href="index.html">首页</a>
+            <a href="lugou.html">卢沟桥</a>
+            <a href="guangji.html">广济桥</a>
+            <a href="bridge-map.html">桥梁地图</a>
+        </div>
+        <div class="logo">
+            <a href="index.html">桥韵中华</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="map-container">
+            <div id="baidu-map"></div>
+            <div class="quick-btns">
+                <button class="quick-btn" onclick="askBot('港珠澳大桥')">港珠澳大桥</button>
+                <button class="quick-btn" onclick="askBot('赵州桥')">赵州桥</button>
+                <button class="quick-btn" onclick="askBot('卢沟桥')">卢沟桥</button>
+                <button class="quick-btn" onclick="askBot('最古老的桥')">最古老的桥</button>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="bot-avatar">桥</div>
+                <div class="bot-info">
+                    <h3>桥宝</h3>
+                    <span class="status" id="voice-status">在线</span>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot-message">
+                    <div class="avatar">桥</div>
+                    <div class="message-content">
+                        你好呀！我是桥宝，你的智能导游~ 🌉<br>
+                        可以问我任何关于中国桥梁的问题，比如：<br>
+                        • "港珠澳大桥在哪里？"<br>
+                        • "最古老的桥是什么？"<br>
+                        • "看看卢沟桥"<br>
+                        我帮你跳转查看详情！<br><br>
+                        <strong>🎤 支持语音对话啦！点击下方麦克风开始~</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <button id="mic-btn" class="mic-btn" onclick="toggleVoice()">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z"/>
+                        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                    </svg>
+                </button>
+                <input type="text" id="user-input" placeholder="问我关于桥梁的问题..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()" class="send-btn">发送</button>
+                <button id="speak-btn" class="speak-btn" onclick="toggleBotSpeak()" title="语音播报">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="voice-indicator" id="voice-indicator">
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <span>正在聆听...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="bridge-popup" id="bridge-popup">
+        <button class="close-popup" onclick="closePopup()">×</button>
+        <h3 id="popup-name"></h3>
+        <p class="popup-location" id="popup-location"></p>
+        <div class="popup-details">
+            <p><strong>类型:</strong> <span id="popup-type"></span></p>
+            <p><strong>年份:</strong> <span id="popup-year"></span></p>
+        </div>
+        <p class="popup-desc" id="popup-desc"></p>
+    </div>
+
+    <script src="./js/chat.js"></script>
+</body>
+</html>

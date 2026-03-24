@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>桥韵中华 - 桥梁地图</title>
+    <link rel="stylesheet" href="./css/map.css">
+    <!-- 百度地图 -->
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=axsFrFPnexU0a1m6VKYwAQ6BLPuhfvKj"></script>
+    <!-- TensorFlow.js Handpose 本地文件 -->
+    <script src="./js/tf.min.js"></script>
+    <script src="./js/handpose.min.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="nav-links">
+            <a href="index.html">首页</a>
+            <a href="lugou.html">卢沟桥</a>
+            <a href="guangji.html">广济桥</a>
+            <a href="bridge-map.html" class="active">桥梁地图</a>
+        </div>
+        <div class="logo">
+            <a href="index.html">桥韵中华</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="map-section">
+            <div id="baidu-map"></div>
+            <div class="map-controls">
+                <button id="gesture-toggle" class="btn primary">开启手势控制</button>
+                <div class="gesture-status" id="gesture-status">手势控制: 关闭</div>
+            </div>
+        </div>
+
+        <div class="camera-section">
+            <video id="camera-feed" autoplay playsinline></video>
+            <canvas id="gesture-canvas"></canvas>
+            <div class="camera-overlay">
+                <div class="camera-title">
+                    <h3>手势控制</h3>
+                </div>
+                <div class="gesture-hint">
+                    <h4>操作指南</h4>
+                    <ul>
+                        <li>✋ 张手：放大地图</li>
+                        <li>✊ 握拳：缩小地图</li>
+                        <li>👆 指向上：向上滑动</li>
+                        <li>👇 指向下：向下滑动</li>
+                        <li>👉 指向右：向右滑动</li>
+                        <li>👈 指向左：向左滑动</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bridge-info-panel" id="bridge-info">
+        <button class="close-btn" onclick="closeBridgeInfo()">×</button>
+        <h3 id="bridge-name"></h3>
+        <p class="bridge-location" id="bridge-location"></p>
+        <div class="bridge-details">
+            <p><strong>类型:</strong> <span id="bridge-type"></span></p>
+            <p><strong>建造年份:</strong> <span id="bridge-year"></span></p>
+            <p><strong>长度:</strong> <span id="bridge-length"></span> 米</p>
+            <p><strong>主跨:</strong> <span id="bridge-span"></span> 米</p>
+        </div>
+        <p class="bridge-desc" id="bridge-desc"></p>
+        <p class="bridge-history" id="bridge-history"></p>
+    </div>
+
+    <script src="./js/map.js"></script>
+</body>
+</html>

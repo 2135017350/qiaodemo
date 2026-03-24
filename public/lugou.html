@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>桥韵中华 - 卢沟桥沉浸式体验</title>
+    
+    <!-- Fonts - Premium Chinese Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=ZCOOL+XiaoWei&family=Ma+Shan+Zheng&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #050508;
+            --text-primary: #e8e4dc;
+            --text-secondary: #9a9590;
+            --accent-gold: #c9a962;
+            --accent-amber: #d4a84b;
+            --accent-red: #8b2323;
+            --ink-black: #1a1815;
+            --paper-cream: #f5f0e6;
+            --font-display: 'Ma Shan Zheng', 'Noto Serif SC', serif;
+            --font-body: 'Noto Serif SC', 'Noto Serif', serif;
+            --font-accent: 'ZCOOL XiaoWei', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            line-height: 1.8;
+        }
+
+        /* ==================== WebGL Canvas ==================== */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        /* Paper Texture Overlay */
+        #paper-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* ==================== Navigation ==================== */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 25px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(5,5,8,0.95), transparent);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+        }
+
+        nav.scrolled {
+            padding: 15px 50px;
+            background: rgba(5,5,8,0.98);
+            border-bottom: 1px solid rgba(201,169,98,0.1);
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            color: var(--accent-gold);
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(201,169,98,0.3);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            padding: 5px 0;
+            transition: all 0.4s ease;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent-gold);
+            transition: width 0.4s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-gold);
+        }
+
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+
+        /* ==================== Hero Section ==================== */
+        #hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* Ink wash background effect */
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 30% 20%, rgba(201,169,98,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(139,35,35,0.05) 0%, transparent 40%);
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        #hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(4rem, 12vw, 10rem);
+            color: var(--accent-gold);
+            text-shadow: 0 0 60px rgba(201,169,98,0.4);
+            letter-spacing: 20px;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        #hero-subtitle {
+            font-family: var(--font-accent);
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            color: var(--text-secondary);
+            letter-spacing: 8px;
+            margin-top: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .hero-meta {
+            margin-top: 60px;
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            opacity: 0;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meta-value {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            color: var(--accent-gold);
+        }
+
+        .meta-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+        }
+
+        .scroll-text {
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: var(--text-secondary);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, var(--accent-gold), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.8); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        /* ==================== Sections ==================== */
+        section {
+            min-height: 100vh;
+            padding: 120px 8vw;
+            position: relative;
+        }
+
+        .section-header {
+            margin-bottom: 80px;
+            text-align: center;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: var(--text-primary);
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+        }
+
+        /* ==================== History Timeline ==================== */
+        #history {
+            background: linear-gradient(180deg, transparent 0%, rgba(10,10,15,0.8) 30%, rgba(10,10,15,0.9) 70%, transparent 100%);
+            position: relative;
+        }
+
+        /* Chinese pattern decoration */
+        #history::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, rgba(201,169,98,0.02) 1px, transparent 1px),
+                linear-gradient(rgba(201,169,98,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 0;
+        }
+
+        /* Central line */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(201,169,98,0.3) 10%, rgba(201,169,98,0.3) 90%, transparent);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: flex-end;
+            padding-right: calc(50% + 40px);
+            position: relative;
+            margin-bottom: 80px;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .timeline-item:nth-child(even) {
+            justify-content: flex-start;
+            padding-right: 0;
+            padding-left: calc(50% + 40px);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 30px;
+            width: 12px;
+            height: 12px;
+            background: var(--bg-color);
+            border: 2px solid var(--accent-gold);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            transition: all 0.4s ease;
+            z-index: 2;
+        }
+
+        .timeline-item.active::before {
+            background: var(--accent-gold);
+            box-shadow: 0 0 20px rgba(201,169,98,0.6);
+            transform: translateX(-50%) scale(1.3);
+        }
+
+        .timeline-content {
+            max-width: 400px;
+            padding: 30px 35px;
+            background: rgba(20,18,15,0.8);
+            border: 1px solid rgba(201,169,98,0.15);
+            position: relative;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+        }
+
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            width: 15px;
+            height: 1px;
+            background: rgba(201,169,98,0.3);
+        }
+
+        .timeline-item:not(:nth-child(even)) .timeline-content::before {
+            right: -30px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content::before {
+            left: -30px;
+        }
+
+        .timeline-content:hover {
+            border-color: rgba(201,169,98,0.4);
+            transform: translateY(-5px);
+            background: rgba(30,28,25,0.9);
+        }
+
+        .timeline-date {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .timeline-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.9;
+        }
+
+        /* ==================== 3D Architecture Section ==================== */
+        #architecture {
+            height: 100vh;
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .arch-overlay {
+            position: absolute;
+            bottom: 60px;
+            left: 60px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .arch-overlay h2 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+        }
+
+        .arch-overlay p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        .arch-controls {
+            position: absolute;
+            top: 50%;
+            right: 50px;
+            transform: translateY(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .arch-btn {
+            background: rgba(10,10,15,0.8);
+            border: 1px solid rgba(201,169,98,0.3);
+            color: var(--text-secondary);
+            padding: 12px 25px;
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .arch-btn:hover, .arch-btn.active {
+            background: var(--accent-gold);
+            color: var(--ink-black);
+            border-color: var(--accent-gold);
+        }
+
+        /* Info Card */
+        #info-card {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: rgba(10,10,15,0.95);
+            border: 1px solid var(--accent-gold);
+            padding: 40px 50px;
+            width: 420px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 20;
+            backdrop-filter: blur(20px);
+        }
+
+        #info-card.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        #info-card h3 {
+            font-family: var(--font-display);
+            color: var(--accent-gold);
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        #info-card p {
+            color: var(--text-secondary);
+            line-height: 2;
+            font-size: 1rem;
+        }
+
+        #info-card .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+        }
+
+        #info-card .close-btn:hover {
+            color: var(--accent-gold);
+        }
+
+        /* ==================== Traffic Hub ==================== */
+        #traffic {
+            min-height: 100vh;
+            display: flex;
+            background: linear-gradient(135deg, #08080a 0%, #0c0c10 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #traffic::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 50% 50%, rgba(201,169,98,0.03) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .traffic-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .traffic-map-wrapper {
+            flex: 2;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #traffic-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .traffic-sidebar {
+            flex: 1;
+            max-width: 450px;
+            background: rgba(10,10,15,0.95);
+            border-left: 1px solid rgba(201,169,98,0.1);
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+
+        .traffic-title {
+            font-family: var(--font-display);
+            color: var(--accent-gold);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .traffic-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(201,169,98,0.1);
+            letter-spacing: 1px;
+        }
+
+        #chart-container {
+            width: 100%;
+            height: 220px;
+            margin-bottom: 30px;
+        }
+
+        .traffic-timeline {
+            margin-top: auto;
+            padding: 30px 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            color: var(--accent-gold);
+            font-family: var(--font-display);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            padding: 15px 0;
+        }
+
+        .slider-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(201,169,98,0.2);
+            transform: translateY(-50%);
+        }
+
+        .slider-track-active {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 2px;
+            background: var(--accent-gold);
+            transform: translateY(-50%);
+            width: 0%;
+            box-shadow: 0 0 10px var(--accent-gold);
+        }
+
+        input[type=range] {
+            width: 100%;
+            -webkit-appearance: none;
+            background: transparent;
+            height: 40px;
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(201,169,98,0.6);
+            margin-top: -8px;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 2px;
+            background: transparent;
+        }
+
+        .timeline-markers {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding: 0 5px;
+        }
+
+        .marker {
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .marker:hover, .marker.active {
+            color: var(--accent-gold);
+        }
+
+        .marker::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .marker:hover::before, .marker.active::before {
+            background: var(--accent-gold);
+        }
+
+        .event-display {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(139,35,35,0.1);
+            border-left: 3px solid var(--accent-red);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+
+        .event-display.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .event-year {
+            color: var(--accent-red);
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .event-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ==================== Poetry Section ==================== */
+        #poetry {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(180deg, transparent 0%, rgba(10,10,15,0.5) 50%, transparent 100%);
+        }
+
+        .poetry-content {
+            max-width: 700px;
+            padding: 60px;
+            position: relative;
+        }
+
+        .poetry-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid rgba(201,169,98,0.2);
+            pointer-events: none;
+        }
+
+        .poetry-quote {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: var(--text-primary);
+            line-height: 2.2;
+            margin-bottom: 40px;
+        }
+
+        .poetry-quote::before {
+            content: '"';
+            font-size: 5rem;
+            color: var(--accent-gold);
+            opacity: 0.3;
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-family: Georgia, serif;
+        }
+
+        .poetry-author {
+            color: var(--accent-gold);
+            font-size: 1rem;
+            letter-spacing: 3px;
+        }
+
+        .poetry-divider {
+            width: 60px;
+            height: 1px;
+            background: var(--accent-gold);
+            margin: 40px auto;
+        }
+
+        .poetry-original {
+            font-family: var(--font-accent);
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            line-height: 2.5;
+        }
+
+        /* ==================== Footer ==================== */
+        footer {
+            padding: 60px 40px;
+            text-align: center;
+            border-top: 1px solid rgba(201,169,98,0.1);
+        }
+
+        footer p {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+        }
+
+        /* ==================== Responsive ==================== */
+        @media (max-width: 1024px) {
+            .traffic-container {
+                flex-direction: column;
+            }
+            
+            .traffic-sidebar {
+                max-width: 100%;
+                border-left: none;
+                border-top: 1px solid rgba(201,169,98,0.1);
+            }
+            
+            .timeline::before {
+                left: 20px;
+            }
+            
+            .timeline-item,
+            .timeline-item:nth-child(even) {
+                padding-left: 60px;
+                padding-right: 0;
+                justify-content: flex-start;
+            }
+            
+            .timeline-item::before {
+                left: 20px;
+                transform: none;
+            }
+            
+            .timeline-item.active::before {
+                transform: scale(1.3);
+            }
+            
+            .timeline-content::before {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 20px 25px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            section {
+                padding: 80px 20px;
+            }
+            
+            .arch-controls {
+                right: 20px;
+            }
+            
+            .traffic-sidebar {
+                padding: 30px 20px;
+            }
+        }
+
+        /* ==================== Loading Screen ==================== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-text {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: var(--accent-gold);
+            letter-spacing: 10px;
+            margin-bottom: 30px;
+        }
+
+        .loader-bar {
+            width: 200px;
+            height: 2px;
+            background: rgba(201,169,98,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loader-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 30%;
+            background: var(--accent-gold);
+            animation: loadSlide 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loadSlide {
+            0% { left: -30%; }
+            100% { left: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="loader-text">桥韵中华</div>
+        <div class="loader-bar"></div>
+    </div>
+
+    <!-- WebGL Background -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- Paper Texture -->
+    <div id="paper-overlay"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="logo">桥韵中华</div>
+        <div class="nav-links">
+            <a href="#history">历史沿革</a>
+            <a href="#architecture">建筑巡礼</a>
+            <a href="#traffic">京西门户</a>
+            <a href="#poetry">诗词歌赋</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section id="hero">
+        <div class="hero-content">
+            <h1 id="hero-title">卢沟桥</h1>
+            <p id="hero-subtitle">北京市现存最古老的十一孔联拱石桥</p>
+            <div class="hero-meta">
+                <div class="meta-item">
+                    <span class="meta-value">1189</span>
+                    <span class="meta-label">始建年份</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-value">501</span>
+                    <span class="meta-label">石狮总数</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-value">266</span>
+                    <span class="meta-label">桥长(米)</span>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span class="scroll-text">探索</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- History Timeline -->
+    <section id="history">
+        <div class="section-header">
+            <span class="section-label">History Timeline</span>
+            <h2 class="section-title">历史沿革</h2>
+        </div>
+        
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">金大定二十九年</span>
+                    <p class="timeline-desc">始建，原名"广利桥"。历经八百年风雨，依然屹立于永定河上，见证朝代更迭与历史变迁。</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">清康熙三十七年</span>
+                    <p class="timeline-desc">重修，御驾亲临。重建桥面，铺设花岗岩条石，稳固如初。"卢沟晓月"成为燕京八景之一。</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">1937年7月7日</span>
+                    <p class="timeline-desc">七七事变爆发，卢沟桥成为抗战历史见证。炮火下的狮子，象征着不屈的民族精神。</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">1986年</span>
+                    <p class="timeline-desc">卢沟桥历史文物修复工程启动。去除近代公路桥体，恢复古桥原貌，申报世界文化遗产。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture 3D -->
+    <section id="architecture">
+        <div id="canvas-container"></div>
+        
+        <div class="arch-overlay">
+            <h2>建筑巡礼</h2>
+            <p>拖动鼠标旋转查看 · 点击建筑元素了解详情</p>
+        </div>
+
+        <div class="arch-controls">
+            <button class="arch-btn active" data-view="full">全景</button>
+            <button class="arch-btn" data-view="pier">桥墩</button>
+            <button class="arch-btn" data-view="lion">石狮</button>
+        </div>
+
+        <div id="info-card">
+            <div class="close-btn">×</div>
+            <h3 id="info-title">石狮</h3>
+            <p id="info-desc">卢沟桥的石狮雕刻精美，形态各异，被誉为"卢沟桥的狮子——数不清"。</p>
+        </div>
+    </section>
+
+    <!-- Traffic Hub -->
+    <section id="traffic">
+        <div class="traffic-container">
+            <div class="traffic-map-wrapper">
+                <canvas id="traffic-canvas"></canvas>
+            </div>
+            <div class="traffic-sidebar">
+                <h2 class="traffic-title">京西门户 · 数据叙事</h2>
+                <p class="traffic-subtitle">基于明清史料的关税与交通流量可视化</p>
+                
+                <!-- Chart -->
+                <div id="chart-container"></div>
+
+                <!-- Controls -->
+                <div class="traffic-timeline">
+                    <div class="slider-label">
+                        <span>1441</span>
+                        <span id="current-year">1790</span>
+                        <span>1911</span>
+                    </div>
+                    
+                    <div class="slider-wrapper">
+                        <div class="slider-track"></div>
+                        <div class="slider-track-active" id="track-active"></div>
+                        <input type="range" min="1441" max="1911" value="1790" class="slider" id="year-slider">
+                    </div>
+                    
+                    <div class="timeline-markers">
+                        <div class="marker" data-year="1441">设关</div>
+                        <div class="marker" data-year="1644">甲申</div>
+                        <div class="marker" data-year="1790">盛世</div>
+                        <div class="marker" data-year="1900">事变</div>
+                    </div>
+                    
+                    <div id="event-display" class="event-display">
+                        <span class="event-year" id="event-year">乾隆盛世</span>
+                        <p class="event-desc" id="event-desc">关税收于此时达到顶峰，南北货运繁忙。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Poetry -->
+    <section id="poetry">
+        <div class="poetry-content">
+            <p class="poetry-quote">
+                卢沟桥的狮子数不清。<br>
+                这是一句老话，也是我对卢沟桥的第一印象。<br>
+                它们静静地蹲在那里，看尽了八百年的变迁。
+            </p>
+            <p class="poetry-author">— 桥韵中华</p>
+            
+            <div class="poetry-divider"></div>
+            
+            <p class="poetry-original">
+                晓月昭昭玉影寒，<br>
+                永定波光映栏杆。<br>
+                雄狮百态今犹在，<br>
+                不忘历史祭英残。
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 桥韵中华项目组 · 数字文博创新竞赛作品</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    
+    <script>
+        // ==================== 1. Loading Screen ====================
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1500);
+        });
+
+        // ==================== 2. WebGL Background Shader ====================
+        const bgCanvas = document.getElementById('bg-canvas');
+        const bgRenderer = new THREE.WebGLRenderer({ canvas: bgCanvas, alpha: true });
+        bgRenderer.setSize(window.innerWidth, window.innerHeight);
+        
+        const bgScene = new THREE.Scene();
+        const bgCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+        const bgGeometry = new THREE.PlaneGeometry(2, 2);
+        const bgUniforms = {
+            u_time: { value: 0 },
+            u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            u_mouse: { value: new THREE.Vector2(0, 0) },
+            u_scroll: { value: 0 }
+        };
+
+        // Enhanced Ink Wash + Moonlight Shader
+        const bgMaterial = new THREE.ShaderMaterial({
+            uniforms: bgUniforms,
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float u_time;
+                uniform vec2 u_resolution;
+                uniform vec2 u_mouse;
+                uniform float u_scroll;
+                varying vec2 vUv;
+
+                // Simplex noise
+                vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+                float snoise(vec2 v) {
+                    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                    vec2 i  = floor(v + dot(v, C.yy));
+                    vec2 x0 = v -   i + dot(i, C.xx);
+                    vec2 i1;
+                    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                    vec4 x12 = x0.xyxy + C.xxzz;
+                    x12.xy -= i1;
+                    i = mod289(i);
+                    vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+                    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                    m = m*m; m = m*m;
+                    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                    vec3 h = abs(x) - 0.5;
+                    vec3 ox = floor(x + 0.5);
+                    vec3 a0 = x - ox;
+                    m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+                    vec3 g;
+                    g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                    return 130.0 * dot(m, g);
+                }
+
+                // FBM for ink wash effect
+                float fbm(vec2 p) {
+                    float f = 0.0;
+                    f += 0.5000 * snoise(p); p *= 2.02;
+                    f += 0.2500 * snoise(p); p *= 2.03;
+                    f += 0.1250 * snoise(p); p *= 2.01;
+                    f += 0.0625 * snoise(p);
+                    return f;
+                }
+
+                void main() {
+                    vec2 st = gl_FragCoord.xy / u_resolution.xy;
+                    st.x *= u_resolution.x / u_resolution.y;
+                    
+                    vec2 mouse = u_mouse;
+                    mouse.x *= u_resolution.x / u_resolution.y;
+                    
+                    // Scroll effect
+                    float scroll = u_scroll * 0.3;
+                    
+                    // Base dark color
+                    vec3 color = vec3(0.02, 0.02, 0.03);
+                    
+                    // Ink wash layers
+                    float ink1 = fbm(vec2(st.x * 2.0 + scroll, st.y * 3.0) + u_time * 0.05);
+                    float ink2 = fbm(vec2(st.x * 4.0 - scroll * 0.5, st.y * 2.0) + u_time * 0.03);
+                    
+                    // Ink wash effect - darker at bottom
+                    float inkWash = smoothstep(0.3, -0.5, st.y - 0.3) * 0.15;
+                    color += vec3(inkWash) * (0.5 + ink1 * 0.5);
+                    
+                    // Moon
+                    vec2 moonPos = vec2(0.7 + mouse.x * 0.1, 0.75);
+                    float dist = distance(st, moonPos);
+                    float moon = smoothstep(0.06, 0.04, dist);
+                    float moonGlow = 0.015 / dist;
+                    moonGlow = smoothstep(0.8, 0.0, dist);
+                    
+                    // Moon color (warm gold)
+                    color += vec3(0.95, 0.9, 0.75) * moon;
+                    color += vec3(0.7, 0.65, 0.5) * moonGlow * 0.25;
+                    
+                    // Water reflection
+                    if(st.y < 0.35) {
+                        float refY = 0.35 - st.y;
+                        vec2 refPos = vec2(st.x, 0.35 + refY);
+                        float refDist = distance(refPos, moonPos);
+                        float ripple = snoise(vec2(st.x * 30.0 - u_time * 2.0, st.y * 20.0 + u_time));
+                        float reflection = (0.015 / refDist) * (0.5 + ripple * 0.5);
+                        reflection *= smoothstep(0.0, 0.35, refY);
+                        color += vec3(0.8, 0.85, 0.9) * reflection * 0.6;
+                    }
+                    
+                    // Stars
+                    float stars = snoise(st * 100.0) * snoise(st * 150.0);
+                    stars = smoothstep(0.7, 0.9, stars) * 0.3;
+                    color += vec3(stars) * (1.0 - smoothstep(0.3, 0.5, st.y));
+                    
+                    // Vignette
+                    float vignette = 1.0 - length(st - vec2(0.5)) * 0.5;
+                    color *= vignette;
+                    
+                    gl_FragColor = vec4(color, 1.0);
+                }
+            `
+        });
+
+        const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
+        bgScene.add(bgMesh);
+
+        function animateBg() {
+            bgUniforms.u_time.value += 0.016;
+            bgRenderer.render(bgScene, bgCamera);
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+        
+        // Mouse tracking
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 2 - 1;
+            const y = -(e.clientY / window.innerHeight) * 2 + 1;
+            bgUniforms.u_mouse.value.set(x * 0.5, y * 0.5);
+        });
+
+        // Scroll tracking
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            bgUniforms.u_scroll.value = scrollY / maxScroll;
+        });
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            bgRenderer.setSize(window.innerWidth, window.innerHeight);
+            bgUniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+        });
+
+        // ==================== 3. GSAP Animations ====================
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+        // Hero Animation
+        const heroTl = gsap.timeline({ delay: 1.5 });
+        heroTl.to('#hero-title', { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" })
+              .to('#hero-subtitle', { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.5")
+              .to('.hero-meta', { opacity: 1, duration: 0.8 }, "-=0.4")
+              .to('.scroll-indicator', { opacity: 1, duration: 0.6 }, "-=0.2");
+
+        // Nav scroll effect
+        ScrollTrigger.create({
+            start: 'top -80',
+            end: 99999,
+            onUpdate: (self) => {
+                const nav = document.getElementById('navbar');
+                if (self.direction === 1 && self.scroll() > 80) {
+                    nav.classList.add('scrolled');
+                } else if (self.scroll() < 80) {
+                    nav.classList.remove('scrolled');
+                }
+            }
+        });
+
+        // Timeline Animation
+        gsap.utils.toArray('.timeline-item').forEach((item, i) => {
+            gsap.from(item, {
+                opacity: 0,
+                y: 50,
+                duration: 1,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: item,
+                    start: "top 80%",
+                    toggleActions: "play none none reverse"
+                },
+                delay: i * 0.15
+            });
+            
+            ScrollTrigger.create({
+                trigger: item,
+                start: "top 60%",
+                end: "bottom 60%",
+                onEnter: () => item.classList.add('active'),
+                onLeave: () => item.classList.remove('active'),
+                onEnterBack: () => item.classList.add('active'),
+                onLeaveBack: () => item.classList.remove('active')
+            });
+        });
+
+        // Section titles fade in
+        gsap.utils.toArray('.section-header').forEach(header => {
+            gsap.from(header, {
+                opacity: 0,
+                y: 30,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: header,
+                    start: "top 80%"
+                }
+            });
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('.nav-links a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                gsap.to(window, { duration: 1, scrollTo: targetId, ease: "power2.inOut" });
+            });
+        });
+
+        // ==================== 4. Three.js 3D Scene ====================
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        
+        // Camera
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(25, 18, 25);
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        container.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xfff5e6, 0.4);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xffeedd, 1);
+        mainLight.position.set(10, 20, 10);
+        scene.add(mainLight);
+
+        const fillLight = new THREE.DirectionalLight(0xc9a962, 0.3);
+        fillLight.position.set(-10, 10, -10);
+        scene.add(fillLight);
+
+        // Fog for atmosphere
+        scene.fog = new THREE.FogExp2(0x050508, 0.02);
+
+        // Bridge Group
+        const bridgeGroup = new THREE.Group();
+        scene.add(bridgeGroup);
+
+        // Materials
+        const stoneMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x6b6b6b, 
+            roughness: 0.85,
+            metalness: 0.1
+        });
+
+        const goldMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xc9a962, 
+            roughness: 0.3,
+            metalness: 0.8,
+            emissive: 0xc9a962,
+            emissiveIntensity: 0.1
+        });
+
+        // Bridge Deck
+        const deckGeo = new THREE.BoxGeometry(22, 0.8, 7);
+        const deck = new THREE.Mesh(deckGeo, stoneMaterial);
+        deck.position.y = 0;
+        deck.userData = { type: 'deck', title: '桥面', desc: '路面共分三层结构：面层砖石、腰层砖石、桥面基石。采用花岗岩条石铺砌，历经八百年而不损。' };
+        bridgeGroup.add(deck);
+
+        // Arches
+        const archGroup = new THREE.Group();
+        const archMat = new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.9 });
+        
+        for(let i = -5; i <= 5; i++) {
+            const radius = 2.8;
+            const archGeo = new THREE.TorusGeometry(radius, 0.9, 16, 32, Math.PI);
+            const arch = new THREE.Mesh(archGeo, archMat);
+            arch.rotation.y = Math.PI / 2;
+            arch.position.set(i * 2.0, -1.2, 0);
+            arch.userData = { type: 'arch', title: '联拱', desc: `这是卢沟桥的第${i+6}孔。桥墩建筑设计呈船型，能够有效分水，减轻洪水冲击。` };
+            archGroup.add(arch);
+        }
+        bridgeGroup.add(archGroup);
+
+        // Lions
+        const lionGroup = new THREE.Group();
+        const lionMat = new THREE.MeshStandardMaterial({ color: 0x8b7355, roughness: 0.7 });
+        
+        for(let i = 0; i < 24; i++) {
+            const lionGeo = new THREE.BoxGeometry(0.6, 1.0, 0.5);
+            const lion = new THREE.Mesh(lionGeo, lionMat);
+            lion.position.set((Math.random() - 0.5) * 20, 0.7, 3.0);
+            lion.rotation.y = (Math.random() - 0.5) * 0.3;
+            lion.userData = { type: 'lion', title: '石狮', desc: '石狮姿态各异。史料记载共有501只，现存501只。母狮足下抚幼狮，雄狮足下踩绣球。' };
+            lionGroup.add(lion);
+        }
+        bridgeGroup.add(lionGroup);
+
+        // Ground/Water
+        const groundGeo = new THREE.PlaneGeometry(100, 100);
+        const groundMat = new THREE.MeshStandardMaterial({ 
+            color: 0x1a1a1a, 
+            roughness: 1,
+            metalness: 0
+        });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -5;
+        scene.add(ground);
+
+        // Interaction
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let hoveredObj = null;
+        
+        let isDragging = false;
+        let previousMouse = { x: 0, y: 0 };
+        
+        container.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            previousMouse = { x: e.clientX, y: e.clientY };
+        });
+        
+        container.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - previousMouse.x;
+                bridgeGroup.rotation.y += deltaX * 0.005;
+                previousMouse = { x: e.clientX, y: e.clientY };
+            }
+            
+            const rect = container.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(bridgeGroup.children, true);
+            
+            if (intersects.length > 0) {
+                const obj = intersects[0].object;
+                if (hoveredObj !== obj) {
+                    container.style.cursor = 'pointer';
+                    if(hoveredObj && hoveredObj.material.emissive) {
+                        hoveredObj.material.emissive.setHex(0x000000);
+                    }
+                    hoveredObj = obj;
+                    if(obj.material.emissive) {
+                        obj.material.emissive.setHex(0x332211);
+                    }
+                }
+            } else {
+                container.style.cursor = 'grab';
+                if(hoveredObj && hoveredObj.material.emissive) {
+                    hoveredObj.material.emissive.setHex(0x000000);
+                    hoveredObj = null;
+                }
+            }
+        });
+        
+        container.addEventListener('mouseup', () => isDragging = false);
+        container.addEventListener('mouseleave', () => isDragging = false);
+
+        container.addEventListener('click', () => {
+            if (hoveredObj && hoveredObj.userData) {
+                document.getElementById('info-title').innerText = hoveredObj.userData.title;
+                document.getElementById('info-desc').innerText = hoveredObj.userData.desc;
+                document.getElementById('info-card').classList.add('visible');
+            }
+        });
+
+        document.querySelector('.close-btn').addEventListener('click', () => {
+            document.getElementById('info-card').classList.remove('visible');
+        });
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Camera controls
+        document.querySelectorAll('.arch-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.arch-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                const view = e.target.dataset.view;
+                const views = {
+                    'full': { x: 25, y: 18, z: 25 },
+                    'pier': { x: 0, y: 3, z: 8 },
+                    'lion': { x: 18, y: 5, z: 5 }
+                };
+                
+                gsap.to(camera.position, {
+                    ...views[view],
+                    duration: 1.2,
+                    ease: "power3.inOut"
+                });
+            });
+        });
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        // ==================== 5. Traffic Visualization ====================
+        const tCanvas = document.getElementById('traffic-canvas');
+        const tCtx = tCanvas.getContext('2d');
+
+        function resizeCanvas() {
+            tCanvas.width = tCanvas.parentElement.clientWidth;
+            tCanvas.height = tCanvas.parentElement.clientHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // ECharts
+        const chartDom = document.getElementById('chart-container');
+        const myChart = echarts.init(chartDom);
+        
+        const years = [];
+        const revenues = [];
+        for(let y=1441; y<=1911; y+=10) {
+            years.push(y.toString());
+            let rev = 0;
+            if (y < 1644) rev = 100 + Math.random()*50;
+            else if (y < 1790) rev = 150 + (y-1644)*0.5 + Math.random()*20;
+            else rev = Math.max(50, 200 - (y-1790)*1.5);
+            revenues.push(Math.floor(rev));
+        }
+
+        myChart.setOption({
+            tooltip: { trigger: 'axis', backgroundColor: 'rgba(10,10,15,0.9)', borderColor: '#c9a962' },
+            grid: { top: 20, bottom: 25, left: 35, right: 15 },
+            xAxis: { 
+                type: 'category', 
+                data: years,
+                axisLine: { lineStyle: { color: '#333' } },
+                axisLabel: { color: '#666', fontSize: 9 }
+            },
+            yAxis: { 
+                type: 'value',
+                splitLine: { lineStyle: { color: '#222', type: 'dashed' } },
+                axisLabel: { color: '#666', fontSize: 9 }
+            },
+            series: [{
+                data: revenues,
+                type: 'line',
+                smooth: true,
+                lineStyle: { color: '#c9a962', width: 2 },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: 'rgba(201,169,98,0.4)' },
+                        { offset: 1, color: 'rgba(201,169,98,0)' }
+                    ])
+                }
+            }]
+        });
+
+        // Traffic Canvas Animation
+        const bridgePos = { x: 0.5, y: 0.5 };
+        const routes = [
+            { to: '京城', x: 0.5, y: 0.2, flow: 1.0, label: '京官道' },
+            { to: '西山', x: 0.2, y: 0.35, flow: 0.6, label: '煤窑' },
+            { to: '津门', x: 0.8, y: 0.45, flow: 0.8, label: '海运' },
+            { to: '南方', x: 0.5, y: 0.85, flow: 1.2, label: '商道' }
+        ];
+
+        const particles = [];
+
+        function drawTraffic() {
+            tCtx.clearRect(0, 0, tCanvas.width, tCanvas.height);
+            
+            const w = tCanvas.width;
+            const h = tCanvas.height;
+            const currentYear = parseInt(yearSlider.value);
+            const flowMultiplier = (currentYear > 1700 && currentYear < 1800) ? 2.0 : 
+                                   (currentYear > 1441 && currentYear < 1644) ? 1.0 : 0.5;
+
+            // Draw routes
+            routes.forEach(route => {
+                const startX = bridgePos.x * w;
+                const startY = bridgePos.y * h;
+                const endX = route.x * w;
+                const endY = route.y * h;
+                
+                tCtx.beginPath();
+                tCtx.moveTo(startX, startY);
+                tCtx.quadraticCurveTo(startX + (endX-startX)*0.5, startY + (endY-startY)*0.8, endX, endY);
+                
+                const baseWidth = 2 + route.flow * 2;
+                tCtx.lineWidth = baseWidth * flowMultiplier;
+                tCtx.strokeStyle = flowMultiplier > 1.5 ? 'rgba(201,169,98,0.4)' : 'rgba(100,100,100,0.2)';
+                tCtx.stroke();
+            });
+
+            // Add particles
+            if (Math.random() < 0.08) {
+                const rIdx = Math.floor(Math.random() * routes.length);
+                particles.push({
+                    routeIdx: rIdx,
+                    progress: 0,
+                    speed: 0.004 + Math.random() * 0.004
+                });
+            }
+
+            // Update particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.progress += p.speed * flowMultiplier;
+                
+                if(p.progress >= 1) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                const route = routes[p.routeIdx];
+                const startX = bridgePos.x * w;
+                const startY = bridgePos.y * h;
+                const endX = route.x * w;
+                const endY = route.y * h;
+                
+                const t = p.progress;
+                const x = (1-t)*(1-t)*startX + 2*(1-t)*t*(startX + (endX-startX)*0.5) + t*t*endX;
+                const y = (1-t)*(1-t)*startY + 2*(1-t)*t*(startY + (endY-startY)*0.8) + t*t*endY;
+                
+                tCtx.beginPath();
+                tCtx.arc(x, y, 2 + route.flow, '#c9a962');
+                tCtx.fillStyle = flowMultiplier > 1.0 ? '#fff' : '#666';
+                tCtx.fill();
+            }
+            
+            // Bridge hub
+            tCtx.beginPath();
+            tCtx.arc(bridgePos.x * w, bridgePos.y * h, 10, 0, Math.PI * 2);
+            tCtx.fillStyle = '#fff';
+            tCtx.shadowBlur = 20;
+            tCtx.shadowColor = '#c9a962';
+            tCtx.fill();
+            
+            // Labels
+            tCtx.fillStyle = "rgba(255,255,255,0.4)";
+            tCtx.font = "11px 'Noto Serif SC'";
+            tCtx.textAlign = "center";
+            tCtx.fillText("卢沟桥", bridgePos.x * w, bridgePos.y * h + 30);
+
+            requestAnimationFrame(drawTraffic);
+        }
+        drawTraffic();
+
+        // Timeline Controls
+        const yearSlider = document.getElementById('year-slider');
+        const currentYearLabel = document.getElementById('current-year');
+        const eventDisplay = document.getElementById('event-display');
+        const trackActive = document.getElementById('track-active');
+
+        const events = {
+            1441: { title: "明设关", desc: "京师门户，验放入京货物。" },
+            1644: { title: "甲申之变", desc: "战乱影响，通商一度中断。" },
+            1790: { title: "乾隆盛世", desc: "税收鼎盛，商户往来频繁。" },
+            1900: { title: "庚子事变", desc: "铁路兴起，运河废弃，桥运渐衰。" }
+        };
+
+        function updateTimeline(year) {
+            currentYearLabel.innerText = year;
+            
+            const min = 1441, max = 1911;
+            const percent = ((year - min) / (max - min)) * 100;
+            trackActive.style.width = percent + "%";
+
+            let foundEvent = null;
+            Object.keys(events).forEach(key => {
+                if (Math.abs(year - parseInt(key)) < 5) foundEvent = events[key];
+            });
+
+            if (foundEvent) {
+                document.getElementById('event-year').innerText = year + " " + foundEvent.title;
+                document.getElementById('event-desc').innerText = foundEvent.desc;
+                eventDisplay.classList.add('active');
+            } else {
+                eventDisplay.classList.remove('active');
+            }
+        }
+
+        yearSlider.addEventListener('input', (e) => {
+            updateTimeline(parseInt(e.target.value));
+        });
+
+        document.querySelectorAll('.marker').forEach(marker => {
+            marker.addEventListener('click', (e) => {
+                const year = parseInt(e.target.dataset.year);
+                yearSlider.value = year;
+                updateTimeline(year);
+                
+                document.querySelectorAll('.marker').forEach(m => m.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+
+        // Initialize
+        updateTimeline(1790);
+        
+        // Resize handler
+        window.addEventListener('resize', () => {
+            myChart.resize();
+        });
+    </script>
+</body>
+</html>

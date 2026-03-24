@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卢沟晓月 · 京畿通衢 数据大屏</title>
+    
+    <style>
+        @keyframes markerPulse {
+            0%, 100% {
+                width: 24px;
+                height: 24px;
+                box-shadow: 0 0 0 3px #a83636, 0 0 12px rgba(168, 54, 54, 0.6);
+            }
+            50% {
+                width: 28px;
+                height: 28px;
+                box-shadow: 0 0 0 2px #a83636, 0 0 20px rgba(168, 54, 54, 0.8);
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+    </style>
+    
+    <!-- 高德地图API -->
+    <script src="https://webapi.amap.com/maps?v=2.0&key=8c233006d964a2606810b0778fc75837"></script>
+    
+    <!-- 引入 ECharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+
+    <style>
+        /* ==================== 深色主题仪表盘布局 ==================== */
+        :root {
+            --bg-dark: #0b1017;
+            --bg-panel: rgba(16, 22, 35, 0.95);
+            --border-color: rgba(88, 122, 180, 0.25);
+            --text-primary: #e5ecff;
+            --text-secondary: #9fb5ff;
+            --accent-cyan: #4dd0ff;
+            --accent-gold: #d4af37;
+            --accent-red: #ff6b6b;
+            --accent-green: #4ecdc4;
+            --accent-purple: #a78bfa;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 整体三行布局：顶部导航 + 中间主区 + 底部统计 */
+        .dash-root {
+            display: grid;
+            grid-template-rows: 64px minmax(0, 1fr) 120px;
+            grid-template-columns: 100%;
+            height: 100vh;
+            padding: 12px;
+            gap: 10px;
+        }
+
+        /* 顶部栏 */
+        .dash-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #151b29, #101623);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
+        }
+        
+        .dash-title {
+            font-size: 20px;
+            letter-spacing: 0.15em;
+            font-family: "Ma Shan Zheng", "Noto Serif SC", serif;
+            background: linear-gradient(90deg, var(--accent-gold), #fff, var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .dash-header-right {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .header-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header-stat .value {
+            color: var(--accent-cyan);
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .refresh-btn {
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 4px;
+            opacity: 0.6;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .refresh-btn:hover {
+            opacity: 1;
+            transform: rotate(180deg);
+        }
+        
+        .refresh-btn.spinning {
+            animation: spin 0.6s ease-in-out;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .value-updated {
+            animation: valuePulse 0.5s ease;
+        }
+        
+        @keyframes valuePulse {
+            0% { color: var(--accent-cyan); transform: scale(1); }
+            50% { color: var(--accent-gold); transform: scale(1.1); }
+            100% { color: var(--accent-cyan); transform: scale(1); }
+        }
+
+        /* 中间主区 */
+        .dash-main {
+            display: grid;
+            grid-template-columns: 260px minmax(0, 1fr) 300px;
+            grid-template-rows: minmax(0, 1fr);
+            gap: 10px;
+        }
+
+        .panel {
+            border-radius: 10px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 20px rgba(0,0,0,0.6);
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        .panel-title {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+        
+        .panel-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: var(--accent-cyan);
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+
+        /* 左侧面板 */
+        .panel-left {
+            gap: 12px;
+        }
+
+        /* 朝代切换按钮 */
+        .dynasty-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .dynasty-btn {
+            background: rgba(77, 208, 255, 0.1);
+            border: 1px solid rgba(77, 208, 255, 0.3);
+            padding: 8px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .dynasty-btn:hover {
+            background: rgba(77, 208, 255, 0.2);
+            color: var(--accent-cyan);
+        }
+        
+        .dynasty-btn.active {
+            background: rgba(77, 208, 255, 0.25);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            box-shadow: 0 0 12px rgba(77, 208, 255, 0.3);
+        }
+
+        /* 左侧指标列表 */
+        .metrics-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .metric-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            padding: 12px;
+            border-left: 3px solid var(--accent-cyan);
+        }
+        
+        .metric-item.active {
+            background: rgba(77, 208, 255, 0.1);
+            border-left-color: var(--accent-gold);
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .metric-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .metric-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .metric-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        /* 中央地图区 */
+        .panel-center {
+            position: relative;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        #map {
+            position: absolute;
+            inset: 0;
+            border-radius: 10px;
+        }
+        
+        .map-overlay {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .map-badge {
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: rgba(11, 16, 30, 0.85);
+            border: 1px solid rgba(77, 208, 255, 0.4);
+            pointer-events: auto;
+            backdrop-filter: blur(8px);
+        }
+        
+        .map-badge-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-gold);
+            font-family: "Ma Shan Zheng", serif;
+        }
+        
+        .map-badge-stat {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .map-badge-stat span {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* 路线详情弹窗 */
+        .route-popup {
+            position: absolute;
+            top: 80px;
+            right: 16px;
+            width: 280px;
+            max-height: 320px;
+            background: rgba(16, 22, 35, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            z-index: 100;
+            display: none;
+            overflow: hidden;
+            animation: popupSlide 0.3s ease;
+        }
+
+        .route-popup.show {
+            display: block;
+        }
+
+        @keyframes popupSlide {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: linear-gradient(90deg, rgba(77, 208,0.1), 255,  transparent);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .popup-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-gold);
+            font-family: "Ma Shan Zheng", serif;
+        }
+
+        .popup-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.3s;
+        }
+
+        .popup-close:hover {
+            color: var(--accent-cyan);
+        }
+
+        .popup-content {
+            padding: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .landmark-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-cyan);
+            transition: all 0.3s;
+        }
+
+        .landmark-item:hover {
+            background: rgba(77, 208, 255, 0.1);
+            transform: translateX(4px);
+        }
+
+        .landmark-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .landmark-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(77, 208, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            flex-shrink: 0;
+            font-size: 12px;
+        }
+
+        .landmark-info {
+            flex: 1;
+        }
+
+        .landmark-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .landmark-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .landmark-type {
+            font-size: 10px;
+            color: var(--accent-cyan);
+            background: rgba(77, 208, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 6px;
+        }
+
+        /* 右侧面板 */
+        .panel-right {
+            gap: 12px;
+        }
+
+        /* 描述文字 */
+        .dynasty-desc {
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .dynasty-desc strong {
+            color: var(--accent-gold);
+        }
+
+        /* 图片展示 */
+        .gallery-mini {
+            flex: 0 0 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .gallery-mini img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.5s;
+        }
+        
+        .gallery-dots {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+        }
+        
+        .gallery-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+        }
+        
+        .gallery-dot.active {
+            background: var(--accent-cyan);
+        }
+
+        /* 底部多图表 */
+        .dash-footer {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+        
+        .footer-card {
+            border-radius: 10px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .footer-card-title {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .footer-card-title:hover {
+            color: var(--accent-cyan);
+        }
+        
+        .footer-chart {
+            flex: 1;
+            min-height: 50px;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(77, 208, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .dash-main {
+                grid-template-columns: minmax(0, 1fr);
+                grid-template-rows: minmax(0, 1fr) 200px 200px;
+                grid-template-areas:
+                    "center"
+                    "left"
+                    "right";
+            }
+            .panel-center { grid-area: center; }
+            .panel-left { grid-area: left; }
+            .panel-right { grid-area: right; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dash-root">
+        <!-- 顶部导航 -->
+        <header class="dash-header">
+            <div class="dash-title">卢沟晓月 · 京畿通衢 数据总览</div>
+            <div class="dash-header-right">
+                <div class="header-stat">
+                    <span>当前朝代：</span>
+                    <span class="value" id="header-dynasty">明代</span>
+                </div>
+                <div class="header-stat">
+                    <span>实时关税：</span>
+                    <span class="value" id="header-tax">18,000</span>
+                    <span>两/年</span>
+                    <span class="refresh-btn" id="refresh-tax" title="刷新数据">🔄</span>
+                </div>
+                <div class="header-stat">
+                    <span>日均人流：</span>
+                    <span class="value" id="header-flow">3,200</span>
+                    <span>人</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 中部主区域 -->
+        <main class="dash-main">
+            <!-- 左侧：朝代切换 + 指标 -->
+            <section class="panel panel-left">
+                <div class="panel-title"><span>朝代切换</span></div>
+                <div class="dynasty-btns">
+                    <button class="dynasty-btn" onclick="setDynasty('jin', this)">金代</button>
+                    <button class="dynasty-btn" onclick="setDynasty('yuan', this)">元代</button>
+                    <button class="dynasty-btn active" onclick="setDynasty('ming', this)">明代</button>
+                    <button class="dynasty-btn" onclick="setDynasty('qing', this)">清代</button>
+                </div>
+
+                <div class="panel-title"><span>历朝关税对比</span></div>
+                <div class="metrics-list" id="metrics-list">
+                    <!-- 动态生成 -->
+                </div>
+            </section>
+
+            <!-- 中央：地图 -->
+            <section class="panel panel-center">
+                <div id="map"></div>
+                <div class="map-overlay">
+                    <div class="map-badge">
+                        <div class="map-badge-title" id="map-title">明代·卢沟桥</div>
+                        <div class="map-badge-stat">京畿南大门 · 交通要冲</div>
+                    </div>
+                    <div class="map-badge">
+                        <div class="map-badge-stat">
+                            关税 <span id="map-tax">18,000</span> 两/年 &nbsp;|&nbsp; 
+                            人流 <span id="map-flow">3,200</span> 人/日
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 路线详情弹窗 -->
+                <div class="route-popup" id="route-popup">
+                    <div class="popup-header">
+                        <span class="popup-title" id="popup-title">沿途驿站点</span>
+                        <button class="popup-close" onclick="closePopup()">×</button>
+                    </div>
+                    <div class="popup-content" id="popup-content">
+                        <!-- 动态生成地标列表 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 右侧：描述 + 图片 -->
+            <section class="panel panel-right">
+                <div class="panel-title"><span>历史背景</span></div>
+                <div class="dynasty-desc" id="dynasty-desc">
+                    明代多次修缮卢沟桥，设巡检司。此路为进京官道，关卡森严，商税繁重，但人流如织，极为繁华，乃京南第一要津。
+                </div>
+
+                <div class="panel-title"><span>桥影像</span></div>
+                <div class="gallery-mini">
+                    <img src="img/imgs/1.jpg" alt="卢沟桥" id="gallery-img" />
+                    <div class="gallery-dots">
+                        <div class="gallery-dot active" onclick="switchGallery(0)"></div>
+                        <div class="gallery-dot" onclick="switchGallery(1)"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部：多图表 -->
+        <footer class="dash-footer">
+            <div class="footer-card">
+                <div class="footer-card-title">历朝关税趋势</div>
+                <div class="footer-chart" id="chart-trend"></div>
+            </div>
+            <div class="footer-card">
+                <div class="footer-card-title">货物来源占比</div>
+                <div class="footer-chart" id="chart-goods"></div>
+            </div>
+            <div class="footer-card">
+                <div class="footer-card-title" id="chart-time-title">人流时段分布 <span style="font-size:10px;color:#666">(点击筛选)</span></div>
+                <div class="footer-chart" id="chart-time"></div>
+            </div>
+            <div class="footer-card">
+                <div class="footer-card-title">桥梁修缮记录</div>
+                <div class="footer-chart" id="chart-repair"></div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 引入高德地图插件 -->
+    <script src="https://webapi.amap.com/maps?v=2.0&key=8c233006d964a2606810b0778fc75837&plugin=AMap.Polyline,AMap.Marker"></script>
+
+    <script>
+        // ==================== 1. 数据定义 ====================
+        const dynasties = {
+            jin: {
+                name: "金代",
+                color: "#8B4513",
+                weight: 3,
+                path: [[116.10, 39.75], [116.15, 39.80], [116.218, 39.854], [116.25, 39.90], [116.30, 39.95]],
+                tax: "5,000",
+                taxNum: 5000,
+                flow: "800",
+                flowNum: 800,
+                desc: "<strong>金代定都燕京</strong>（今北京），卢沟桥（时称广利桥）始建。此路为连接中原与中都的要道，商旅初兴，车马稀疏。作为北方政权南下的必经之路，战略地位初显。",
+                landmarks: [
+                    { name: "卢沟桥", desc: "金代始建，原名广利桥", type: "桥梁" },
+                    { name: "良乡", desc: "北方重镇，军事防御要地", type: "城镇" },
+                    { name: "琉璃河", desc: "南北商道重要渡口", type: "渡口" },
+                    { name: "涿州", desc: "北方门户，接待使臣之所", type: "州府" }
+                ]
+            },
+            yuan: {
+                name: "元代",
+                color: "#4682B4",
+                weight: 3.5,
+                path: [[116.20, 39.70], [116.21, 39.78], [116.218, 39.854], [116.23, 39.92], [116.24, 39.98], [116.25, 40.05]],
+                tax: "12,000",
+                taxNum: 12000,
+                flow: "2,500",
+                flowNum: 2500,
+                desc: "<strong>马可·波罗盛赞</strong>此桥「美丽绝伦」。作为大都城南门外的咽喉，驿道宽阔，车马辐辏，是通往全国各地的枢纽。元代统一后，商贸空前繁荣。",
+                landmarks: [
+                    { name: "卢沟桥", desc: "马可·波罗称其为「美丽绝伦」", type: "桥梁" },
+                    { name: "大都丽正门", desc: "元大都南门，驿道起点", type: "城门" },
+                    { name: "通州", desc: "运河终点，物资集散地", type: "城镇" },
+                    { name: "河西务", desc: "税收要地，榷场所在", type: "关隘" },
+                    { name: "漷州", desc: "马匹交易集市", type: "城镇" }
+                ]
+            },
+            ming: {
+                name: "明代",
+                color: "#2E8B57",
+                weight: 3.5,
+                path: [[116.05, 39.72], [116.12, 39.80], [116.218, 39.854], [116.28, 39.90], [116.35, 39.96]],
+                tax: "18,000",
+                taxNum: 18000,
+                flow: "3,200",
+                flowNum: 3200,
+                desc: "明代<strong>多次修缮</strong>卢沟桥，设巡检司。此路为进京官道，关卡森严，商税繁重，但人流如织，极为繁华，乃<strong>京南第一要津</strong>。",
+                landmarks: [
+                    { name: "卢沟桥", desc: "设巡检司，收取关税", type: "桥梁" },
+                    { name: "永定门", desc: "京师南大门", type: "城门" },
+                    { name: "南苑", desc: "皇家猎场，官员过往歇息", type: "御苑" },
+                    { name: "黄村", desc: "商旅集散，市集繁荣", type: "市镇" },
+                    { name: "良乡", desc: "递运所，公文马匹换乘", type: "驿站" },
+                    { name: "琉璃河", desc: "巡检司驻守，检查商货", type: "关隘" }
+                ]
+            },
+            qing: {
+                name: "清代",
+                color: "#800080",
+                weight: 3,
+                path: [[116.08, 39.74], [116.16, 39.82], [116.218, 39.854], [116.26, 39.89], [116.32, 39.94]],
+                tax: "15,000",
+                taxNum: 15000,
+                flow: "2,800",
+                flowNum: 2800,
+                desc: "清代<strong>康熙、乾隆</strong>多次题咏卢沟桥。虽漕运渐衰，但陆路交通依然重要，桥畔店铺林立，烟火气十足。<strong>「卢沟晓月」</strong>成为燕京八景之一。",
+                landmarks: [
+                    { name: "卢沟桥", desc: "康熙、乾隆题咏，燕京八景", type: "桥梁" },
+                    { name: "永定门", desc: "清代修缮，規制一新", type: "城门" },
+                    { name: "南顶", desc: "碧霞元君庙，香火鼎盛", type: "庙宇" },
+                    { name: "小红门", desc: "皇室出入通道", type: "门关" },
+                    { name: "庞村", desc: "客栈林立，商贾往来", type: "市镇" },
+                    { name: "立垡", desc: "运河码头，货物转运", type: "码头" }
+                ]
+            }
+        };
+
+        let currentPolyline = null;
+        let currentMarker = null;
+        let amap = null;
+
+        // ==================== 2. 初始化地图 ====================
+        function initMap() {
+            amap = new AMap.Map('map', {
+                zoom: 12,
+                center: [116.218, 39.854],
+                mapStyle: 'amap://styles/dark', // 深色地图
+                pitch: 0,
+                rotation: 0
+            });
+        }
+
+        // ==================== 3. 核心功能函数 ====================
+        
+        // 流动动画定时器
+        let flowAnimationTimer = null;
+        
+        function setDynasty(key, btnElement) {
+            const data = dynasties[key];
+
+            // 更新按钮状态
+            document.querySelectorAll('.dynasty-btn').forEach(btn => btn.classList.remove('active'));
+            if (btnElement) {
+                btnElement.classList.add('active');
+            } else {
+                const activeBtn = document.querySelector(`button[onclick="setDynasty('${key}', this)"]`);
+                if (activeBtn) activeBtn.classList.add('active');
+            }
+
+            // 清除旧图层和动画
+            if (currentPolyline) amap.remove(currentPolyline);
+            if (currentMarker) amap.remove(currentMarker);
+            if (flowAnimationTimer) {
+                clearInterval(flowAnimationTimer);
+                flowAnimationTimer = null;
+            }
+
+            // ==== 绘制底层路线（较粗、较暗） ====
+            currentPolyline = new AMap.Polyline({
+                path: data.path,
+                strokeColor: data.color,
+                strokeWeight: data.weight + 2,  // 底层更粗
+                strokeOpacity: 0.3,
+                strokeStyle: 'solid',
+                lineJoin: 'round',
+                map: amap
+            });
+
+            // ==== 绘制流动光效路线 ====
+            // 使用虚线+动画实现流动效果
+            let dashOffset = 0;
+            const flowLine = new AMap.Polyline({
+                path: data.path,
+                strokeColor: data.color,
+                strokeWeight: data.weight + 1,
+                strokeOpacity: 1,
+                strokeStyle: 'dashed',
+                strokeDasharray: [15, 8],  // 15像素实线，8像素间隔
+                strokeDashoffset: 0,
+                lineJoin: 'round',
+                map: amap
+            });
+            
+            // 存储当前流动线条引用
+            currentPolyline = flowLine;
+
+            // ==== 启动流动动画 ====
+            flowAnimationTimer = setInterval(() => {
+                dashOffset -= 1.5;  // 向左流动，模拟从外向内
+                flowLine.setOptions({
+                    strokeDashoffset: dashOffset
+                });
+            }, 30);
+
+            // ==== 添加路线点击事件 ====
+            // 点击路线显示地标弹窗
+            flowLine.on('click', function() {
+                showLandmarksPopup(data);
+            });
+
+            // 底层路线也添加点击事件
+            currentPolyline.on('click', function() {
+                showLandmarksPopup(data);
+            });
+
+            // 添加卢沟桥标记（带脉冲光晕）
+            const markerContent = `
+                <div style="position: relative;">
+                    <div style="
+                        position: absolute;
+                        width: 40px;
+                        height: 40px;
+                        background: ${data.color};
+                        border-radius: 50%;
+                        opacity: 0.3;
+                        animation: ripple 2s ease-out infinite;
+                        transform: translate(-8px, -8px);
+                    "></div>
+                    <div style="
+                        width: 24px;
+                        height: 24px;
+                        background: ${data.color};
+                        border-radius: 50%;
+                        border: 3px solid rgba(255,255,255,0.9);
+                        box-shadow: 0 0 15px ${data.color}, 0 0 30px ${data.color}80;
+                    "></div>
+                </div>
+            `;
+            
+            const marker = new AMap.Marker({
+                position: [116.218, 39.854],
+                title: '卢沟桥',
+                map: amap,
+                content: markerContent,
+                offset: new AMap.Pixel(-12, -12)
+            });
+            currentMarker = marker;
+
+            // 地图自动缩放
+            amap.setFitView();
+
+            // 更新所有UI
+            updateUI(data);
+        }
+
+        function updateUI(data) {
+            // 顶部栏
+            document.getElementById('header-dynasty').innerText = data.name;
+            document.getElementById('header-tax').innerText = data.tax;
+            document.getElementById('header-flow').innerText = data.flow;
+
+            // 地图标题
+            document.getElementById('map-title').innerText = `${data.name}·卢沟桥`;
+            document.getElementById('map-tax').innerText = data.tax;
+            document.getElementById('map-flow').innerText = data.flow;
+
+            // 描述
+            document.getElementById('dynasty-desc').innerHTML = data.desc;
+
+            // 更新指标列表
+            updateMetrics(data);
+
+            // 更新图表高亮
+            updateChartsHighlight(data);
+        }
+
+        function updateMetrics(currentData) {
+            const container = document.getElementById('metrics-list');
+            let html = '';
+            const maxTax = 18000;
+
+            for (const [key, data] of Object.entries(dynasties)) {
+                const percent = (data.taxNum / maxTax) * 100;
+                const isActive = key === Object.keys(dynasties).find(k => dynasties[k] === currentData) ? 'active' : '';
+                
+                html += `
+                    <div class="metric-item ${isActive}">
+                        <div class="metric-label">${data.name}</div>
+                        <div class="metric-value">${data.tax} <span style="font-size:11px;color:var(--text-secondary)">两/年</span></div>
+                        <div class="metric-bar">
+                            <div class="metric-bar-fill" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        // ==================== 4. 图表初始化 ====================
+        let chartTrend, chartGoods, chartTime, chartRepair;
+        
+        // 不同时段的货物数据
+        const timePeriodGoods = {
+            '晨': [  // 清晨：主要是日用品和早餐食材
+                { value: 45, name: '新鲜食材', itemStyle: { color: '#4ecdc4' } },
+                { value: 25, name: '日用百货', itemStyle: { color: '#ff6b6b' } },
+                { value: 15, name: '粮油米面', itemStyle: { color: '#a78bfa' } },
+                { value: 10, name: '手工艺品', itemStyle: { color: '#d4af37' } },
+                { value: 5, name: '其他', itemStyle: { color: '#6c757d' } }
+            ],
+            '午': [  // 中午：货物高峰，大宗商品
+                { value: 35, name: '南方丝茶', itemStyle: { color: '#4ecdc4' } },
+                { value: 25, name: '西山煤炭', itemStyle: { color: '#ff6b6b' } },
+                { value: 20, name: '山西铁器', itemStyle: { color: '#a78bfa' } },
+                { value: 15, name: '各地药材', itemStyle: { color: '#d4af37' } },
+                { value: 5, name: '其他', itemStyle: { color: '#6c757d' } }
+            ],
+            '暮': [  // 傍晚：收市，剩余货物
+                { value: 30, name: '南方丝茶', itemStyle: { color: '#4ecdc4' } },
+                { value: 20, name: '西山煤炭', itemStyle: { color: '#ff6b6b' } },
+                { value: 25, name: '各地药材', itemStyle: { color: '#d4af37' } },
+                { value: 15, name: '手工艺品', itemStyle: { color: '#a78bfa' } },
+                { value: 10, name: '其他', itemStyle: { color: '#6c757d' } }
+            ],
+            '夜': [  // 夜晚：走私与特殊货物
+                { value: 40, name: '私盐', itemStyle: { color: '#ff6b6b' } },
+                { value: 25, name: '珠宝丝绸', itemStyle: { color: '#d4af37' } },
+                { value: 15, name: '违禁物品', itemStyle: { color: '#a78bfa' } },
+                { value: 10, name: '情报书信', itemStyle: { color: '#4ecdc4' } },
+                { value: 10, name: '其他', itemStyle: { color: '#6c757d' } }
+            ]
+        };
+        
+        // 不同时段的说明文字
+        const timePeriodDesc = {
+            '晨': '清晨通关多为日常所需，商贩赶在开市前进城',
+            '午': '午间为货物运输高峰，南北货物在此交汇',
+            '暮': '傍晚收市，剩余货物清点入库',
+            '夜': '夜间通关多涉及走私与紧急事务，戒备森严'
+        };
+
+        function initCharts() {
+            // 关税趋势图
+            chartTrend = echarts.init(document.getElementById('chart-trend'));
+            chartTrend.setOption({
+                backgroundColor: 'transparent',
+                grid: { top: 10, right: 10, bottom: 20, left: 40 },
+                xAxis: {
+                    type: 'category',
+                    data: ['金代', '元代', '明代', '清代'],
+                    axisLine: { lineStyle: { color: '#334' } },
+                    axisLabel: { color: '#9fb5ff', fontSize: 10 }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { show: false },
+                    splitLine: { lineStyle: { color: '#223' } },
+                    axisLabel: { color: '#9fb5ff', fontSize: 10 }
+                },
+                series: [{
+                    data: [5000, 12000, 18000, 15000],
+                    type: 'line',
+                    smooth: true,
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(77, 208, 255, 0.3)' },
+                            { offset: 1, color: 'rgba(77, 208, 255, 0)' }
+                        ])
+                    },
+                    lineStyle: { color: '#4dd0ff', width: 2 },
+                    itemStyle: { color: '#4dd0ff' }
+                }]
+            });
+
+            // 货物来源图
+            chartGoods = echarts.init(document.getElementById('chart-goods'));
+            chartGoods.setOption({
+                backgroundColor: 'transparent',
+                series: [{
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['50%', '50%'],
+                    data: [
+                        { value: 35, name: '南方丝茶', itemStyle: { color: '#4ecdc4' } },
+                        { value: 25, name: '西山煤炭', itemStyle: { color: '#ff6b6b' } },
+                        { value: 20, name: '山西铁器', itemStyle: { color: '#a78bfa' } },
+                        { value: 15, name: '各地药材', itemStyle: { color: '#d4af37' } },
+                        { value: 5, name: '其他', itemStyle: { color: '#6c757d' } }
+                    ],
+                    label: { show: false },
+                    labelLine: { show: false }
+                }]
+            });
+
+            // 人流时段图 - 可点击筛选
+            chartTime = echarts.init(document.getElementById('chart-time'));
+            chartTime.setOption({
+                backgroundColor: 'transparent',
+                grid: { top: 10, right: 10, bottom: 20, left: 30 },
+                xAxis: {
+                    type: 'category',
+                    data: ['晨', '午', '暮', '夜'],
+                    axisLine: { lineStyle: { color: '#334' } },
+                    axisLabel: { color: '#9fb5ff', fontSize: 10 }
+                },
+                yAxis: {
+                    type: 'value',
+                    show: false
+                },
+                series: [{
+                    data: [120, 380, 280, 80],
+                    type: 'bar',
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: '#4dd0ff' },
+                            { offset: 1, color: 'rgba(77, 208, 255, 0.3)' }
+                        ]),
+                        borderRadius: [4, 4, 0, 0]
+                    },
+                    barWidth: '60%',
+                    emphasis: {
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: '#d4af37' },
+                                { offset: 1, color: 'rgba(212, 175, 55, 0.3)' }
+                            ])
+                        }
+                    }
+                }]
+            });
+            
+            // 人流时段图点击事件
+            chartTime.on('click', function(params) {
+                const period = params.name;
+                updateGoodsChart(period);
+            });
+
+            // 修缮记录图
+            chartRepair = echarts.init(document.getElementById('chart-repair'));
+            chartRepair.setOption({
+                backgroundColor: 'transparent',
+                grid: { top: 10, right: 10, bottom: 20, left: 40 },
+                xAxis: {
+                    type: 'category',
+                    data: ['金', '元', '明', '清'],
+                    axisLine: { lineStyle: { color: '#334' } },
+                    axisLabel: { color: '#9fb5ff', fontSize: 10 }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { show: false },
+                    splitLine: { lineStyle: { color: '#223' } },
+                    axisLabel: { color: '#9fb5ff', fontSize: 10 }
+                },
+                series: [{
+                    data: [1, 2, 8, 5],
+                    type: 'bar',
+                    itemStyle: { color: '#d4af37', borderRadius: [4, 4, 0, 0] }
+                }]
+            });
+
+            // 响应式
+            window.addEventListener('resize', () => {
+                chartTrend.resize();
+                chartGoods.resize();
+                chartTime.resize();
+                chartRepair.resize();
+            });
+            
+            // 点击标题也可以切换（循环切换）
+            document.getElementById('chart-time-title').addEventListener('click', function() {
+                const periods = ['晨', '午', '暮', '夜'];
+                let currentIndex = periods.indexOf(currentPeriod || '午');
+                let nextIndex = (currentIndex + 1) % periods.length;
+                updateGoodsChart(periods[nextIndex]);
+            });
+        }
+
+        function updateChartsHighlight(data) {
+            // 可以在这里添加图表高亮逻辑
+        }
+        
+        // 更新货物图表（根据时间段）
+        let currentPeriod = '午';
+        
+        function updateGoodsChart(period) {
+            currentPeriod = period;
+            const goodsData = timePeriodGoods[period];
+            
+            // 更新图表
+            chartGoods.setOption({
+                series: [{
+                    data: goodsData
+                }]
+            });
+            
+            // 显示时段提示
+            showPeriodTip(period);
+        }
+        
+        // 显示时段提示
+        function showPeriodTip(period) {
+            // 可以添加一个提示效果，这里简单修改标题
+            const title = document.querySelectorAll('.footer-card-title')[1];
+            if (title) {
+                const originalText = '货物来源占比';
+                title.innerHTML = `货物来源 <span style="color:var(--accent-gold)">${period}</span>时`;
+                title.dataset.original = originalText;
+            }
+        }
+
+        // ==================== 路线地标弹窗 ====================
+        function showLandmarksPopup(data) {
+            const popup = document.getElementById('route-popup');
+            const title = document.getElementById('popup-title');
+            const content = document.getElementById('popup-content');
+            
+            // 设置标题
+            title.innerText = `${data.name} · 沿途驿站点`;
+            
+            // 生成地标列表
+            const icons = {
+                '桥梁': '🌉',
+                '城镇': '🏘️',
+                '渡口': '⛵',
+                '州府': '🏯',
+                '城门': '🚪',
+                '关隘': '🏰',
+                '驿站': '🐴',
+                '市镇': '🏪',
+                '御苑': '🌳',
+                '庙宇': '⛩️',
+                '门关': '🚧',
+                '码头': '⚓'
+            };
+            
+            let html = '';
+            data.landmarks.forEach((landmark, index) => {
+                const icon = icons[landmark.type] || '📍';
+                html += `
+                    <div class="landmark-item" style="animation-delay: ${index * 0.1}s">
+                        <div class="landmark-icon">${icon}</div>
+                        <div class="landmark-info">
+                            <div class="landmark-name">
+                                ${landmark.name}
+                                <span class="landmark-type">${landmark.type}</span>
+                            </div>
+                            <div class="landmark-desc">${landmark.desc}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = html;
+            popup.classList.add('show');
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('route-popup');
+            popup.classList.remove('show');
+        }
+
+        // ==================== 5. 图片轮播 ====================
+        let galleryIndex = 0;
+        const galleryImages = ['img/imgs/1.jpg', 'img/imgs/2.jpg'];
+
+        function switchGallery(index) {
+            galleryIndex = index;
+            document.getElementById('gallery-img').src = galleryImages[index];
+            document.querySelectorAll('.gallery-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        setInterval(() => {
+            galleryIndex = (galleryIndex + 1) % galleryImages.length;
+            switchGallery(galleryIndex);
+        }, 4000);
+
+        // ==================== 6. 初始化 ====================
+        window.onload = function() {
+            initMap();
+            initCharts();
+            setDynasty('ming', null);
+            
+            // 点击地图其他地方关闭弹窗
+            amap.on('click', function() {
+                closePopup();
+            });
+            
+            // 刷新按钮功能
+            const refreshBtn = document.getElementById('refresh-tax');
+            refreshBtn.addEventListener('click', function() {
+                // 旋转动画
+                this.classList.add('spinning');
+                setTimeout(() => this.classList.remove('spinning'), 600);
+                
+                // 数据更新效果
+                const taxEl = document.getElementById('header-tax');
+                const flowEl = document.getElementById('header-flow');
+                const mapTaxEl = document.getElementById('map-tax');
+                const mapFlowEl = document.getElementById('map-flow');
+                
+                // 获取当前数值
+                let currentTax = parseInt(taxEl.innerText.replace(/,/g, ''));
+                let currentFlow = parseInt(flowEl.innerText.replace(/,/g, ''));
+                
+                // 随机波动 (±5%)
+                const taxChange = Math.round(currentTax * (Math.random() * 0.1 - 0.05));
+                const flowChange = Math.round(currentFlow * (Math.random() * 0.1 - 0.05));
+                
+                // 渐变更新数值
+                let steps = 10;
+                let step = 0;
+                const interval = setInterval(() => {
+                    step++;
+                    const progress = step / steps;
+                    const eased = 1 - Math.pow(1 - progress, 3); // easeOut
+                    
+                    const newTax = Math.round(currentTax + taxChange * eased);
+                    const newFlow = Math.round(currentFlow + flowChange * eased);
+                    
+                    taxEl.innerText = newTax.toLocaleString();
+                    flowEl.innerText = newFlow.toLocaleString();
+                    mapTaxEl.innerText = newTax.toLocaleString();
+                    mapFlowEl.innerText = newFlow.toLocaleString();
+                    
+                    if (step >= steps) {
+                        clearInterval(interval);
+                        // 脉冲效果
+                        taxEl.classList.add('value-updated');
+                        flowEl.classList.add('value-updated');
+                        setTimeout(() => {
+                            taxEl.classList.remove('value-updated');
+                            flowEl.classList.remove('value-updated');
+                        }, 500);
+                    }
+                }, 30);
+            });
+        };
+    </script>
+</body>
+</html>

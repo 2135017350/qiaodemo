@@ -1,0 +1,2626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>广济桥·潮汐锁钥 - 结构解密</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Ma+Shan+Zheng&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+        :root {
+            --ink: #1a1a1a;
+            --ink-light: #4a4a4a;
+            --paper: #f5f0e6;
+            --paper-dark: #e8e0d0;
+            --gold: #c9a227;
+            --rust: #8b4513;
+            --water: #2c5f7c;
+            --water-light: #4a8fb8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: var(--paper);
+            color: var(--ink);
+            overflow-x: hidden;
+        }
+
+        /* 页面容器 */
+        .container {
+            width: 100vw;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 标题区域 */
+        .title-section {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            position: relative;
+        }
+
+        .title-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .main-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--ink) 0%, var(--rust) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.2em;
+        }
+
+        .subtitle {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            color: var(--ink-light);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        .intro-text {
+            max-width: 800px;
+            margin: 1.5rem auto 0;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--ink-light);
+            border-left: 3px solid var(--gold);
+            padding-left: 1.5rem;
+        }
+
+        /* 图纸容器 */
+        .blueprint-container {
+            width: 100%;
+            height: 70vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(201, 162, 39, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(44, 95, 124, 0.05) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a227' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        /* SVG 图纸 */
+        .blueprint-svg {
+            width: 95%;
+            height: 100%;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.1));
+        }
+
+        /* 交互热点 */
+        .hotspot {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .hotspot:hover {
+            filter: brightness(1.2) drop-shadow(0 0 15px rgba(201, 162, 39, 0.6));
+        }
+
+        .hotspot.active {
+            filter: brightness(1.3) drop-shadow(0 0 20px rgba(201, 162, 39, 0.8));
+        }
+
+        /* 热点标签 */
+        .hotspot-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            fill: var(--ink);
+            pointer-events: none;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .hotspot:hover .hotspot-label {
+            opacity: 1;
+            font-weight: 600;
+        }
+
+        /* 浮层 */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(26, 26, 26, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .overlay-content {
+            background: var(--paper);
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            border-radius: 8px;
+            padding: 2.5rem;
+            position: relative;
+            transform: translateY(30px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 25px 80px rgba(0,0,0,0.4),
+                inset 0 0 0 2px var(--gold);
+        }
+
+        .overlay.active .overlay-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--ink);
+            background: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--ink);
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--ink);
+            color: var(--paper);
+            transform: rotate(90deg);
+        }
+
+        .overlay-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2rem;
+            color: var(--ink);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .overlay-title::before {
+            content: '';
+            width: 50px;
+            height: 3px;
+            background: var(--gold);
+        }
+
+        .overlay-diagram {
+            background: var(--paper-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(201, 162, 39, 0.3);
+        }
+
+        .overlay-text {
+            font-size: 1.05rem;
+            line-height: 1.9;
+            color: var(--ink-light);
+        }
+
+        .overlay-text blockquote {
+            font-style: italic;
+            border-left: 3px solid var(--gold);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--rust);
+            font-size: 1.1rem;
+        }
+
+        .annotation {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--gold);
+        }
+
+        /* 梭船动画容器 */
+        .boat-animation {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            background: linear-gradient(180deg, var(--paper-dark) 0%, var(--water) 100%);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+
+        .water {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(180deg, transparent 0%, var(--water) 100%);
+        }
+
+        .water::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 20px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120'%3E%3Cpath fill='%234a8fb8' d='M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 L1200,120 L0,120 Z'/%3E%3C/svg%3E");
+            background-size: 600px 20px;
+            animation: wave 3s linear infinite;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-600px); }
+        }
+
+        /* 梭船 */
+        .boat {
+            position: absolute;
+            bottom: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 50px;
+            transition: all 2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .boat.opened {
+            bottom: 30%;
+            transform: translateX(-120%);
+        }
+
+        .boat.closed {
+            bottom: 30%;
+            transform: translateX(-50%);
+        }
+
+        .boat-body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, var(--rust) 0%, #5c2e0d 100%);
+            clip-path: polygon(10% 0%, 90% 0%, 100% 70%, 80% 100%, 20% 100%, 0% 70%);
+            position: relative;
+        }
+
+        .boat-body::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 8px;
+            background: var(--ink);
+        }
+
+        /* 铁索动画 */
+        .cable-animation {
+            width: 100%;
+            height: 150px;
+            position: relative;
+            background: var(--paper-dark);
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .cable {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            width: 80%;
+            height: 8px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--rust) 0px,
+                var(--rust) 10px,
+                var(--ink) 10px,
+                var(--ink) 15px
+            );
+            transform: translateY(-50%);
+        }
+
+        .cable-end {
+            position: absolute;
+            top: 50%;
+            width: 30px;
+            height: 40px;
+            background: var(--ink);
+            transform: translateY(-50%);
+        }
+
+        .cable-end.left { left: 5%; }
+        .cable-end.right { right: 5%; }
+
+        /* 石墩结构图 */
+        .pier-diagram {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            background: linear-gradient(180deg, var(--paper-dark) 0%, #8b7355 100%);
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .layer {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .layer-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--ink-light);
+            margin-top: 0.3rem;
+        }
+
+        /* 指引线 */
+        .pointer-line {
+            stroke: var(--gold);
+            stroke-width: 1;
+            stroke-dasharray: 5,5;
+            fill: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .hotspot:hover .pointer-line {
+            opacity: 1;
+        }
+
+        /* 图例 */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 1.5rem;
+            background: rgba(201, 162, 39, 0.1);
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid var(--ink);
+        }
+
+        /* 底部导航 */
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 2rem;
+        }
+
+        .footer-btn {
+            padding: 1rem 2rem;
+            border: 2px solid var(--ink);
+            background: transparent;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-btn:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .blueprint-container {
+                height: 50vh;
+            }
+            
+            .overlay-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+            
+            .legend {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+        }
+
+        /* 动画关键帧 */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .hotspot.active .hotspot-circle {
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        /* ==================== 模块二：商贸解构样式 ==================== */
+        .commerce-section {
+            background: var(--paper);
+            padding: 3rem 2rem;
+            position: relative;
+            border-top: 2px solid var(--gold);
+        }
+
+        .commerce-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 10% 90%, rgba(201, 162, 39, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 90% 10%, rgba(44, 95, 124, 0.03) 0%, transparent 40%),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 50 L60 40 L70 50 L60 60 Z' fill='%23c9a227' fill-opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .commerce-header {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 2rem;
+        }
+
+        .commerce-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--rust) 0%, var(--ink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.3rem;
+        }
+
+        .commerce-subtitle {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .commerce-intro {
+            max-width: 700px;
+            margin: 1.5rem auto 0;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--ink-light);
+            border-left: 3px solid var(--rust);
+            padding-left: 1.2rem;
+            text-align: left;
+        }
+
+        .commerce-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 2rem auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 热力图容器 */
+        .heatmap-container {
+            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(245,240,230,0.9) 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(201, 162, 39, 0.2);
+            box-shadow: 
+                0 10px 40px rgba(0,0,0,0.08),
+                inset 0 0 0 1px rgba(201, 162, 39, 0.1);
+        }
+
+        .heatmap-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .heatmap-title::before {
+            content: '';
+            width: 30px;
+            height: 3px;
+            background: var(--gold);
+        }
+
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            color: var(--ink-light);
+        }
+
+        .legend-gradient {
+            width: 150px;
+            height: 12px;
+            background: linear-gradient(90deg, #e8d5b5, #c9b896, #a08060, #8b6914);
+            border-radius: 6px;
+            border: 1px solid rgba(139,69,19,0.3);
+        }
+
+        .heatmap-svg {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 4px 15px rgba(0,0,0,0.1));
+        }
+
+        .zhou-block {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .zhou-block:hover {
+            filter: brightness(1.15) drop-shadow(0 0 10px rgba(201, 162, 39, 0.5));
+            stroke-width: 2;
+        }
+
+        .zhou-block.active {
+            filter: brightness(1.2) drop-shadow(0 0 15px rgba(201, 162, 39, 0.7));
+            stroke-width: 3;
+        }
+
+        /* 数据面板 */
+        .data-panel {
+            background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,240,230,0.98) 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(201, 162, 39, 0.2);
+            box-shadow: 
+                0 10px 40px rgba(0,0,0,0.08),
+                inset 0 0 0 1px rgba(201, 162, 39, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, var(--ink) 0%, var(--ink-light) 100%);
+            color: var(--paper);
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .panel-icon {
+            font-size: 1.5rem;
+        }
+
+        .panel-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .panel-content {
+            padding: 1.5rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--ink-light);
+            padding: 2rem 1rem;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+            margin: 0.3rem 0;
+            opacity: 0.7;
+        }
+
+        /* 详情卡片 */
+        .detail-card {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .shop-category {
+            font-size: 0.85rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .shop-name {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.5rem;
+            color: var(--ink);
+            margin-bottom: 1rem;
+        }
+
+        .shop-description {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--ink-light);
+            margin-bottom: 1.5rem;
+        }
+
+        /* 统计数据 */
+        .stats-section {
+            background: var(--paper-dark);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.6rem 0;
+            font-size: 0.85rem;
+        }
+
+        .stat-label {
+            color: var(--ink-light);
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: var(--ink);
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .stat-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+            margin-top: 0.3rem;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), var(--rust));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* 诗歌卡片 */
+        .panel-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--paper-dark);
+            background: rgba(201, 162, 39, 0.05);
+        }
+
+        .poetry-card {
+            background: var(--paper);
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 3px solid var(--gold);
+        }
+
+        .poetry-text {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.95rem;
+            color: var(--ink);
+            font-style: italic;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .poetry-source {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+
+        /* 业态图例 */
+        .commerce-legend {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.7);
+            border-radius: 12px;
+            border: 1px solid rgba(201, 162, 39, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .legend-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 1rem;
+            background: var(--paper);
+            border-radius: 20px;
+            border: 1px solid rgba(201, 162, 39, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .legend-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .legend-icon {
+            font-size: 1.2rem;
+        }
+
+        .legend-name {
+            font-size: 0.85rem;
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .legend-desc {
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            opacity: 0.8;
+        }
+
+        .commerce-footer {
+            margin-top: 2rem;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1024px) {
+            .commerce-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-panel {
+                min-height: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .commerce-title {
+                font-size: 2rem;
+            }
+            
+            .legend-items {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* ==================== 动态商贸沙盘样式 ==================== */
+        .sandbox-container {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,240,230,0.98) 100%);
+            border-radius: 16px;
+            border: 2px solid rgba(201, 162, 39, 0.3);
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.1),
+                inset 0 0 0 1px rgba(201, 162, 39, 0.1);
+        }
+
+        .sandbox-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .sandbox-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2rem;
+            color: var(--ink);
+            margin-bottom: 0.3rem;
+        }
+
+        .sandbox-subtitle {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            margin-bottom: 1rem;
+        }
+
+        .sandbox-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .sandbox-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: linear-gradient(135deg, var(--paper) 0%, var(--paper-dark) 100%);
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--ink);
+            transition: all 0.3s ease;
+        }
+
+        .sandbox-btn:hover {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--rust) 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(201, 162, 39, 0.4);
+        }
+
+        .sandbox-btn.active {
+            background: linear-gradient(135deg, var(--rust) 0%, var(--ink) 100%);
+            color: white;
+        }
+
+        .sandbox-wrapper {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        #sandboxCanvas {
+            width: 100%;
+            height: 350px;
+            background: linear-gradient(180deg, #87CEEB 0%, #98D8C8 50%, #7CB9A8 100%);
+            border-radius: 12px;
+            border: 2px solid rgba(139, 69, 19, 0.2);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.1);
+        }
+
+        .realtime-panel {
+            background: var(--paper);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(201, 162, 39, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .realtime-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--paper-dark);
+        }
+
+        .realtime-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+        }
+
+        .rt-stat {
+            background: var(--paper-dark);
+            padding: 0.8rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .rt-label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--ink-light);
+            margin-bottom: 0.3rem;
+        }
+
+        .rt-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--rust);
+        }
+
+        .trade-log {
+            margin-top: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 120px;
+        }
+
+        .log-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .log-content {
+            flex: 1;
+            overflow-y: auto;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--ink-light);
+        }
+
+        .log-item {
+            padding: 0.4rem 0;
+            border-bottom: 1px dashed rgba(201, 162, 39, 0.2);
+            animation: logFadeIn 0.3s ease;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes logFadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .log-time {
+            color: var(--gold);
+            margin-right: 0.5rem;
+        }
+
+        .log-trade {
+            color: var(--rust);
+        }
+
+        .sandbox-legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px dashed rgba(201, 162, 39, 0.3);
+        }
+
+        .sbl-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--ink-light);
+        }
+
+        .sbl-icon {
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .sandbox-wrapper {
+                grid-template-columns: 1fr;
+            }
+            
+            #sandboxCanvas {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sandbox-title {
+                font-size: 1.5rem;
+            }
+            
+            .sandbox-controls {
+                gap: 0.5rem;
+            }
+            
+            .sandbox-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+            
+            .sandbox-legend {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 标题区域 -->
+        <section class="title-section">
+            <h1 class="main-title">广济桥 · 潮汐锁钥</h1>
+            <p class="subtitle">Structure Decryption · 十八梭船廿四洲</p>
+            <div class="intro-text">
+                "湘子桥"横跨韩江，集梁桥、拱桥、浮桥于一体。<br>
+                以<span style="color: var(--rust); font-weight: 600;">二十四只梭船</span>连接<span style="color: var(--water); font-weight: 600;">十八座石墩</span>，
+                启闭自如，此乃<span style="color: var(--gold); font-weight: 600;">"潮汐锁钥"</span>之精妙所在。
+            </div>
+        </section>
+
+        <!-- 图纸区域 -->
+        <section class="blueprint-container">
+            <svg class="blueprint-svg" viewBox="0 0 1200 500" xmlns="http://www.w3.org/2000/svg">
+                <!-- 背景装饰 -->
+                <defs>
+                    <!-- 渐变定义 -->
+                    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#4a8fb8;stop-opacity:0.3" />
+                        <stop offset="100%" style="stop-color:#2c5f7c;stop-opacity:0.8" />
+                    </linearGradient>
+                    
+                    <linearGradient id="stoneGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#8b8b7a" />
+                        <stop offset="100%" style="stop-color:#5a5a4a" />
+                    </linearGradient>
+                    
+                    <linearGradient id="boatGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#8b4513" />
+                        <stop offset="100%" style="stop-color:#5c2e0d" />
+                    </linearGradient>
+                    
+                    <linearGradient id="cableGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#4a4a4a" />
+                        <stop offset="50%" style="stop-color:#6a6a6a" />
+                        <stop offset="100%" style="stop-color:#4a4a4a" />
+                    </linearGradient>
+
+                    <!-- 阴影滤镜 -->
+                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/>
+                    </filter>
+                    
+                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+
+                    <!-- 图纸纹理 -->
+                    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+                        <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(201,162,39,0.1)" stroke-width="0.5"/>
+                    </pattern>
+                </defs>
+
+                <!-- 背景 -->
+                <rect width="1200" height="500" fill="url(#grid)"/>
+
+                <!-- 水域 -->
+                <path d="M 0 420 Q 300 400, 600 420 Q 900 440, 1200 410 L 1200 500 L 0 500 Z" 
+                      fill="url(#waterGrad)" opacity="0.8"/>
+
+                <!-- 河岸 -->
+                <path d="M 0 380 Q 50 370, 100 385 Q 150 400, 200 390 L 200 500 L 0 500 Z" fill="#6b5b4f"/>
+                <path d="M 1000 395 Q 1050 385, 1100 400 Q 1150 410, 1200 395 L 1200 500 L 1000 500 Z" fill="#6b5b4f"/>
+
+                <!-- === 石墩部分 (左1) === -->
+                <g class="hotspot" id="pier1" data-type="pier">
+                    <!-- 筏形基础 -->
+                    <ellipse cx="130" cy="450" rx="50" ry="15" fill="#5a4a3a" filter="url(#shadow)"/>
+                    <ellipse cx="130" cy="440" rx="45" ry="12" fill="#6b5b4a"/>
+                    <ellipse cx="130" cy="425" rx="40" ry="10" fill="#7a6a5a"/>
+                    
+                    <!-- 墩身 -->
+                    <path d="M 100 380 L 160 380 L 155 420 L 105 420 Z" fill="url(#stoneGrad)" filter="url(#shadow)"/>
+                    <path d="M 105 380 L 155 380 L 150 400 L 110 400 Z" fill="#8b8b7a"/>
+                    
+                    <!-- 墩帽 -->
+                    <rect x="95" y="365" width="70" height="15" rx="3" fill="#9a9a8a"/>
+                    
+                    <!-- 石梁 -->
+                    <rect x="90" y="345" width="80" height="20" rx="2" fill="#7a7a6a"/>
+                    
+                    <!-- 指引线 -->
+                    <line class="pointer-line" x1="130" y1="330" x2="130" y2="200" stroke="#c9a227" stroke-width="1" stroke-dasharray="5,5"/>
+                    <polygon class="pointer-line" points="130,200 125,210 135,210" fill="#c9a227"/>
+                    
+                    <!-- 高亮圆圈 -->
+                    <circle class="hotspot-circle" cx="130" cy="400" r="35" fill="none" stroke="#c9a227" stroke-width="2" opacity="0"/>
+                    <text class="hotspot-label" x="130" y="230" text-anchor="middle">🪨 石墩 · 筏形基础</text>
+                </g>
+
+                <!-- === 石墩部分 (中) === -->
+                <g class="hotspot" id="pier2" data-type="pier">
+                    <ellipse cx="400" cy="450" rx="50" ry="15" fill="#5a4a3a" filter="url(#shadow)"/>
+                    <ellipse cx="400" cy="440" rx="45" ry="12" fill="#6b5b4a"/>
+                    <ellipse cx="400" cy="425" rx="40" ry="10" fill="#7a6a5a"/>
+                    <path d="M 370 380 L 430 380 L 425 420 L 375 420 Z" fill="url(#stoneGrad)" filter="url(#shadow)"/>
+                    <path d="M 375 380 L 425 380 L 420 400 L 380 400 Z" fill="#8b8b7a"/>
+                    <rect x="365" y="365" width="70" height="15" rx="3" fill="#9a9a8a"/>
+                    <rect x="360" y="345" width="80" height="20" rx="2" fill="#7a7a6a"/>
+                    
+                    <circle class="hotspot-circle" cx="400" cy="400" r="35" fill="none" stroke="#c9a227" stroke-width="2" opacity="0"/>
+                    <line class="pointer-line" x1="400" y1="330" x2="400" y2="200" stroke="#c9a227" stroke-width="1" stroke-dasharray="5,5"/>
+                    <polygon class="pointer-line" points="400,200 395,210 405,210" fill="#c9a227"/>
+                    <text class="hotspot-label" x="400" y="230" text-anchor="middle">🪨 石墩 · 筏形基础</text>
+                </g>
+
+                <!-- === 石墩部分 (右) === -->
+                <g class="hotspot" id="pier3" data-type="pier">
+                    <ellipse cx="670" cy="450" rx="50" ry="15" fill="#5a4a3a" filter="url(#shadow)"/>
+                    <ellipse cx="670" cy="440" rx="45" ry="12" fill="#6b5b4a"/>
+                    <ellipse cx="670" cy="425" rx="40" ry="10" fill="#7a6a5a"/>
+                    <path d="M 640 380 L 700 380 L 695 420 L 645 420 Z" fill="url(#stoneGrad)" filter="url(#shadow)"/>
+                    <path d="M 645 380 L 695 380 L 690 400 L 650 400 Z" fill="#8b8b7a"/>
+                    <rect x="635" y="365" width="70" height="15" rx="3" fill="#9a9a8a"/>
+                    <rect x="630" y="345" width="80" height="20" rx="2" fill="#7a7a6a"/>
+                    
+                    <circle class="hotspot-circle" cx="670" cy="400" r="35" fill="none" stroke="#c9a227" stroke-width="2" opacity="0"/>
+                    <line class="pointer-line" x1="670" y1="330" x2="670" y2="200" stroke="#c9a227" stroke-width="1" stroke-dasharray="5,5"/>
+                    <polygon class="pointer-line" points="670,200 665,210 675,210" fill="#c9a227"/>
+                    <text class="hotspot-label" x="670" y="230" text-anchor="middle">🪨 石墩 · 筏形基础</text>
+                </g>
+
+                <!-- === 梭船组 === -->
+                <g class="hotspot" id="boats" data-type="boats">
+                    <!-- 梭船1 (闭合) -->
+                    <g id="boat1">
+                        <path d="M 220 335 L 250 335 L 260 365 L 240 380 L 220 380 L 210 365 Z" fill="url(#boatGrad)" filter="url(#shadow)"/>
+                        <rect x="225" y="330" width="30" height="5" fill="#4a4a4a"/>
+                        <circle cx="235" cy="338" r="3" fill="#c9a227"/>
+                    </g>
+                    
+                    <!-- 梭船2 (闭合) -->
+                    <g id="boat2">
+                        <path d="M 280 335 L 310 335 L 320 365 L 300 380 L 280 380 L 270 365 Z" fill="url(#boatGrad)" filter="url(#shadow)"/>
+                        <rect x="285" y="330" width="30" height="5" fill="#4a4a4a"/>
+                    </g>
+                    
+                    <!-- 梭船3 (闭合) -->
+                    <g id="boat3">
+                        <path d="M 460 335 L 490 335 L 500 365 L 480 380 L 460 380 L 450 365 Z" fill="url(#boatGrad)" filter="url(#shadow)"/>
+                        <rect x="465" y="330" width="30" height="5" fill="#4a4a4a"/>
+                    </g>
+                    
+                    <!-- 梭船4 (闭合) -->
+                    <g id="boat4">
+                        <path d="M 520 335 L 550 335 L 560 365 L 540 380 L 520 380 L 510 365 Z" fill="url(#boatGrad)" filter="url(#shadow)"/>
+                        <rect x="525" y="330" width="30" height="5" fill="#4a4a4a"/>
+                    </g>
+                    
+                    <!-- 梭船5 (闭合) -->
+                    <g id="boat5">
+                        <path d="M 730 335 L 760 335 L 770 365 L 750 380 L 730 380 L 720 365 Z" fill="url(#boatGrad)" filter="url(#shadow)"/>
+                        <rect x="735" y="330" width="30" height="5" fill="#4a4a4a"/>
+                    </g>
+                    
+                    <!-- 梭船6 (闭合) -->
+                    <g id="boat6">
+                        <path d="M 790 335 L 820 335 L 830 365 L 810 380 L 790 380 L 780 365 Z" fill="url(#boatGrad)" filter="url(#shadow)"/>
+                        <rect x="795" y="330" width="30" height="5" fill="#4a4a4a"/>
+                    </g>
+                    
+                    <!-- 梭船7 (闭合) -->
+                    <g id="boat7">
+                        <path d="M 850 335 L 880 335 L 890 365 L 870 380 L 850 380 L 840 365 Z" fill="url(#boatGrad)" filter="url(#shadow)"/>
+                        <rect x="855" y="330" width="30" height="5" fill="#4a4a4a"/>
+                    </g>
+
+                    <!-- 高亮框 -->
+                    <rect x="200" y="320" width="700" height="70" fill="none" stroke="#c9a227" stroke-width="2" stroke-dasharray="10,5" opacity="0"/>
+                    <circle class="hotspot-circle" cx="550" cy="355" r="60" fill="none" stroke="#c9a227" stroke-width="2" opacity="0"/>
+                    
+                    <!-- 标签 -->
+                    <line class="pointer-line" x1="550" y1="300" x2="550" y2="200" stroke="#c9a227" stroke-width="1" stroke-dasharray="5,5"/>
+                    <polygon class="pointer-line" points="550,200 545,210 555,210" fill="#c9a227"/>
+                    <text class="hotspot-label" x="550" y="230" text-anchor="middle">🚢 梭船 · 浮桥启闭</text>
+                </g>
+
+                <!-- === 铁索系统 === -->
+                <g class="hotspot" id="cables" data-type="cables">
+                    <!-- 主铁索 -->
+                    <path d="M 200 310 Q 400 280, 600 310 Q 800 340, 1000 300" 
+                          fill="none" stroke="url(#cableGrad)" stroke-width="6" filter="url(#shadow)"/>
+                    <path d="M 200 320 Q 400 290, 600 320 Q 800 350, 1000 310" 
+                          fill="none" stroke="url(#cableGrad)" stroke-width="4"/>
+                    
+                    <!-- 固定锚点 -->
+                    <circle cx="200" cy="310" r="8" fill="#4a4a4a"/>
+                    <circle cx="1000" cy="300" r="8" fill="#4a4a4a"/>
+                    
+                    <!-- 墩上固定点 -->
+                    <circle cx="265" cy="340" r="5" fill="#6a6a6a"/>
+                    <circle cx="335" cy="340" r="5" fill="#6a6a6a"/>
+                    <circle cx="465" cy="340" r="5" fill="#6a6a6a"/>
+                    <circle cx="535" cy="340" r="5" fill="#6a6a6a"/>
+                    <circle cx="735" cy="340" r="5" fill="#6a6a6a"/>
+                    <circle cx="805" cy="340" r="5" fill="#6a6a6a"/>
+                    <circle cx="875" cy="340" r="5" fill="#6a6a6a"/>
+                    
+                    <!-- 牵引索 (连接到梭船) -->
+                    <line x1="265" y1="340" x2="235" y2="335" stroke="#8b4513" stroke-width="2"/>
+                    <line x1="335" y1="340" x2="305" y2="335" stroke="#8b4513" stroke-width="2"/>
+                    <line x1="465" y1="340" x2="435" y2="335" stroke="#8b4513" stroke-width="2"/>
+                    <line x1="535" y1="340" x2="505" y2="335" stroke="#8b4513" stroke-width="2"/>
+                    <line x1="735" y1="340" x2="705" y2="335" stroke="#8b4513" stroke-width="2"/>
+                    <line x1="805" y1="340" x2="775" y2="335" stroke="#8b4513" stroke-width="2"/>
+                    <line x1="875" y1="340" x2="845" y2="335" stroke="#8b4513" stroke-width="2"/>
+                    
+                    <!-- 高亮 -->
+                    <path d="M 200 310 Q 400 280, 600 310 Q 800 340, 1000 300" 
+                          fill="none" stroke="#c9a227" stroke-width="10" opacity="0" filter="url(#glow)"/>
+                    <circle class="hotspot-circle" cx="600" cy="305" r="50" fill="none" stroke="#c9a227" stroke-width="2" opacity="0"/>
+                    
+                    <!-- 标签 -->
+                    <line class="pointer-line" x1="600" y1="280" x2="600" y2="200" stroke="#c9a227" stroke-width="1" stroke-dasharray="5,5"/>
+                    <polygon class="pointer-line" points="600,200 595,210 605,210" fill="#c9a227"/>
+                    <text class="hotspot-label" x="600" y="230" text-anchor="middle">🔗 铁索 · 受力系统</text>
+                </g>
+
+                <!-- 装饰文字 -->
+                <text x="60" y="480" font-family="'IBM Plex Mono', monospace" font-size="10" fill="#8b8b7a">
+                    Fig.1 广济桥横剖面示意图 · 比例尺：1:100
+                </text>
+            </svg>
+        </section>
+
+        <!-- 图例 -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(180deg, #8b8b7a, #5a5a4a);"></div>
+                <span>石墩（花岗岩）</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(180deg, #8b4513, #5c2e0d);"></div>
+                <span>梭船（铁板船）</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(90deg, #4a4a4a, #6a6a6a, #4a4a4a);"></div>
+                <span>铁索系统</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(180deg, transparent, #2c5f7c);"></div>
+                <span>韩江水面</span>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="footer-nav">
+            <button class="footer-btn" onclick="location.href='index.html'">
+                ← 返回首页
+            </button>
+            <button class="footer-btn" id="replayBtn">
+                ⟳ 重新播放动画
+            </button>
+        </div>
+
+        <!-- ==================== 模块二：商贸解构 ==================== -->
+        <section class="commerce-section" id="commerceModule">
+            <div class="commerce-header">
+                <h2 class="commerce-title">一里长桥一里市</h2>
+                <p class="commerce-subtitle">广济桥商贸业态数据可视化</p>
+                <div class="commerce-intro">
+                    "广济桥头商贾云集，桥上店铺林立。南宋以来，潮州成为海上丝绸之路重要节点，
+                    广济桥成为货物集散中枢，桥上'一里长桥一里市'，其繁华程度堪比州城。"
+                </div>
+            </div>
+
+            <div class="commerce-container">
+                <!-- 左侧：业态热力图 -->
+                <div class="heatmap-container">
+                    <div class="heatmap-title">桥上业态分布热力图</div>
+                    <div class="heatmap-legend">
+                        <span class="legend-label">商业密度：</span>
+                        <span class="legend-gradient"></span>
+                        <span class="legend-values">低 ← → 高</span>
+                    </div>
+                    <svg class="heatmap-svg" viewBox="0 0 1000 400" id="heatmapSvg">
+                        <!-- 背景 -->
+                        <defs>
+                            <linearGradient id="bridgeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#d4c4a8"/>
+                                <stop offset="100%" style="stop-color:#c4b498"/>
+                            </linearGradient>
+                            <filter id="heatGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                            <marker id="arrowMarker" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#c9a227"/>
+                            </marker>
+                        </defs>
+
+                        <!-- 桥面主体 -->
+                        <rect x="50" y="180" width="900" height="80" rx="5" fill="url(#bridgeGrad)" stroke="#8b7355" stroke-width="2"/>
+
+                        <!-- 桥栏杆装饰 -->
+                        <line x1="50" y1="170" x2="950" y2="170" stroke="#5a4a3a" stroke-width="3"/>
+                        <line x1="50" y1="270" x2="950" y2="270" stroke="#5a4a3a" stroke-width="3"/>
+
+                        <!-- 栏杆柱 -->
+                        <g id="railPosts">
+                            <rect x="60" y="160" width="8" height="20" fill="#5a4a3a"/>
+                            <rect x="190" y="160" width="8" height="20" fill="#5a4a3a"/>
+                            <rect x="320" y="160" width="8" height="20" fill="#5a4a3a"/>
+                            <rect x="450" y="160" width="8" height="20" fill="#5a4a3a"/>
+                            <rect x="580" y="160" width="8" height="20" fill="#5a4a3a"/>
+                            <rect x="710" y="160" width="8" height="20" fill="#5a4a3a"/>
+                            <rect x="840" y="160" width="8" height="20" fill="#5a4a3a"/>
+                            <rect x="930" y="160" width="8" height="20" fill="#5a4a3a"/>
+                        </g>
+
+                        <!-- 二十四洲/楼台热力区块 -->
+                        <g id="zhouBlocks">
+                            <!-- 东岸段 (洲1-6) -->
+                            <rect class="zhou-block" data-zhou="1" x="60" y="185" width="80" height="70" rx="3" fill="#e8d5b5" stroke="#c9a227" stroke-width="1" opacity="0.9"/>
+                            <text class="zhou-number" x="100" y="200" text-anchor="middle" font-size="10" fill="#5a4a3a">洲1</text>
+                            <text class="zhou-icon" x="100" y="235" text-anchor="middle" font-size="20">🍵</text>
+
+                            <rect class="zhou-block" data-zhou="2" x="150" y="185" width="80" height="70" rx="3" fill="#d4c4a8" stroke="#c9a227" stroke-width="1" opacity="0.9"/>
+                            <text class="zhou-number" x="190" y="200" text-anchor="middle" font-size="10" fill="#5a4a3a">洲2</text>
+                            <text class="zhou-icon" x="190" y="235" text-anchor="middle" font-size="20">🏺</text>
+
+                            <rect class="zhou-block" data-zhou="3" x="240" y="185" width="80" height="70" rx="3" fill="#e0c9a0" stroke="#c9a227" stroke-width="1" opacity="0.9"/>
+                            <text class="zhou-number" x="280" y="200" text-anchor="middle" font-size="10" fill="#5a4a3a">洲3</text>
+                            <text class="zhou-icon" x="280" y="235" text-anchor="middle" font-size="20">🎨</text>
+
+                            <rect class="zhou-block" data-zhou="4" x="330" y="185" width="80" height="70" rx="3" fill="#c9b896" stroke="#c9a227" stroke-width="1" opacity="0.9"/>
+                            <text class="zhou-number" x="370" y="200" text-anchor="middle" font-size="10" fill="#5a4a3a">洲4</text>
+                            <text class="zhou-icon" x="370" y="235" text-anchor="middle" font-size="20">🥋</text>
+
+                            <rect class="zhou-block" data-zhou="5" x="420" y="185" width="80" height="70" rx="3" fill="#d8c9a8" stroke="#c9a227" stroke-width="1" opacity="0.9"/>
+                            <text class="zhou-number" x="460" y="200" text-anchor="middle" font-size="10" fill="#5a4a3a">洲5</text>
+                            <text class="zhou-icon" x="460" y="235" text-anchor="middle" font-size="20">💊</text>
+
+                            <rect class="zhou-block" data-zhou="6" x="510" y="185" width="80" height="70" rx="3" fill="#e5d2b8" stroke="#c9a227" stroke-width="1" opacity="0.9"/>
+                            <text class="zhou-number" x="550" y="200" text-anchor="middle" font-size="10" fill="#5a4a3a">洲6</text>
+                            <text class="zhou-icon" x="550" y="235" text-anchor="middle" font-size="20">🍶</text>
+
+                            <!-- 浮桥段 (梭船7-18) -->
+                            <rect class="zhou-block" data-zhou="7" x="600" y="185" width="50" height="70" rx="3" fill="#e8d5b5" stroke="#8b4513" stroke-width="1"/>
+                            <text class="zhou-number" x="625" y="200" text-anchor="middle" font-size="9" fill="#5a4a3a">梭7</text>
+
+                            <rect class="zhou-block" data-zhou="8" x="660" y="185" width="50" height="70" rx="3" fill="#d4c4a8" stroke="#8b4513" stroke-width="1"/>
+                            <text class="zhou-number" x="685" y="200" text-anchor="middle" font-size="9" fill="#5a4a3a">梭8</text>
+
+                            <rect class="zhou-block" data-zhou="9" x="720" y="185" width="50" height="70" rx="3" fill="#e0c9a0" stroke="#8b4513" stroke-width="1"/>
+                            <text class="zhou-number" x="745" y="200" text-anchor="middle" font-size="9" fill="#5a4a3a">梭9</text>
+
+                            <rect class="zhou-block" data-zhou="10" x="780" y="185" width="50" height="70" rx="3" fill="#c9b896" stroke="#8b4513" stroke-width="1"/>
+                            <text class="zhou-number" x="805" y="200" text-anchor="middle" font-size="9" fill="#5a4a3a">梭10</text>
+
+                            <rect class="zhou-block" data-zhou="11" x="840" y="185" width="50" height="70" rx="3" fill="#d8c9a8" stroke="#8b4513" stroke-width="1"/>
+                            <text class="zhou-number" x="865" y="200" text-anchor="middle" font-size="9" fill="#5a4a3a">梭11</text>
+
+                            <!-- 西岸段 (洲12-24) -->
+                            <rect class="zhou-block" data-zhou="12" x="900" y="185" width="80" height="70" rx="3" fill="#e5d2b8" stroke="#c9a227" stroke-width="1"/>
+                            <text class="zhou-number" x="940" y="200" text-anchor="middle" font-size="10" fill="#5a4a3a">洲12</text>
+                            <text class="zhou-icon" x="940" y="235" text-anchor="middle" font-size="20">🏠</text>
+                        </g>
+
+                        <!-- 水面装饰 -->
+                        <path d="M 50 280 Q 275 290, 500 280 Q 725 270, 950 285 L 950 380 L 50 380 Z" fill="rgba(44,95,124,0.3)"/>
+                        <text x="500" y="350" text-anchor="middle" font-size="12" fill="rgba(44,95,124,0.6)" font-style="italic">韩江 · Han River</text>
+
+                        <!-- 标注 -->
+                        <text x="100" y="155" text-anchor="middle" font-size="11" fill="#5a4a3a" font-weight="500">东岸·韩山</text>
+                        <text x="625" y="155" text-anchor="middle" font-size="11" fill="#8b4513" font-weight="500">浮桥段</text>
+                        <text x="940" y="155" text-anchor="middle" font-size="11" fill="#5a4a3a" font-weight="500">西岸·金山</text>
+                    </svg>
+                </div>
+
+                <!-- 右侧：数据面板 -->
+                <div class="data-panel" id="dataPanel">
+                    <div class="panel-header">
+                        <span class="panel-icon" id="panelIcon">🏪</span>
+                        <h3 class="panel-title" id="panelTitle">点击热力区块查看详情</h3>
+                    </div>
+                    <div class="panel-content" id="panelContent">
+                        <div class="empty-state">
+                            <div class="empty-icon">👆</div>
+                            <p>点击上方热力图中的楼台或梭船</p>
+                            <p>查看该区域商业形态详情</p>
+                        </div>
+                    </div>
+                    <div class="panel-footer" id="panelFooter">
+                        <div class="poetry-card" id="poetryCard">
+                            <p class="poetry-text" id="poetryText"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 业态分类图例 -->
+            <div class="commerce-legend">
+                <div class="legend-title">业态类型图例</div>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <span class="legend-icon">🍵</span>
+                        <span class="legend-name">茶楼酒肆</span>
+                        <span class="legend-desc">品茶听曲，宴请宾客</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon">🏺</span>
+                        <span class="legend-name">陶瓷器皿</span>
+                        <span class="legend-desc">潮州瓷窑，外销出口</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon">🎨</span>
+                        <span class="legend-name">手工艺品</span>
+                        <span class="legend-desc">潮绣木雕，精致雅玩</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon">🥋</span>
+                        <span class="legend-name">纺织绸缎</span>
+                        <span class="legend-desc">潮州丝绸，织造精美</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon">💊</span>
+                        <span class="legend-name">药材南北</span>
+                        <span class="legend-desc">中药铺，集散药材</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon">🍶</span>
+                        <span class="legend-name">杂货日用</span>
+                        <span class="legend-desc">日用百货，针头线脑</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon">🏠</span>
+                        <span class="legend-name">居中调度</span>
+                        <span class="legend-desc">桥头管理，货物转运</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== 动态商贸沙盘 ==================== -->
+            <div class="sandbox-container" id="sandboxContainer">
+                <div class="sandbox-header">
+                    <h3 class="sandbox-title">📦 动态商贸沙盘</h3>
+                    <p class="sandbox-subtitle">实时模拟广济桥商业活动 · 一里长桥一里市</p>
+                    <div class="sandbox-controls">
+                        <button class="sandbox-btn" id="playPauseBtn">
+                            <span class="btn-icon">▶</span>
+                            <span class="btn-text">开始模拟</span>
+                        </button>
+                        <button class="sandbox-btn" id="speedBtn">
+                            <span class="btn-icon">⚡</span>
+                            <span class="btn-text">速度: 1x</span>
+                        </button>
+                        <button class="sandbox-btn" id="resetBtn">
+                            <span class="btn-icon">🔄</span>
+                            <span class="btn-text">重置</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sandbox-wrapper">
+                    <!-- 沙盘画布 -->
+                    <canvas id="sandboxCanvas"></canvas>
+                    
+                    <!-- 实时数据面板 -->
+                    <div class="realtime-panel">
+                        <div class="realtime-title">📊 实时交易数据</div>
+                        <div class="realtime-stats">
+                            <div class="rt-stat">
+                                <span class="rt-label">今日客流</span>
+                                <span class="rt-value" id="dailyFlow">0</span>
+                            </div>
+                            <div class="rt-stat">
+                                <span class="rt-label">交易笔数</span>
+                                <span class="rt-value" id="dailyTrade">0</span>
+                            </div>
+                            <div class="rt-stat">
+                                <span class="rt-label">交易额(银两)</span>
+                                <span class="rt-value" id="dailyRevenue">0</span>
+                            </div>
+                            <div class="rt-stat">
+                                <span class="rt-label">船只通航</span>
+                                <span class="rt-value" id="dailyShips">0</span>
+                            </div>
+                        </div>
+                        <div class="trade-log" id="tradeLog">
+                            <div class="log-title">📜 交易日志</div>
+                            <div class="log-content" id="logContent">
+                                <!-- 动态添加日志 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 沙盘图例 -->
+                <div class="sandbox-legend">
+                    <div class="sbl-item">
+                        <span class="sbl-icon">🚶</span>
+                        <span class="sbl-name">行人</span>
+                    </div>
+                    <div class="sbl-item">
+                        <span class="sbl-icon">🐎</span>
+                        <span class="sbl-name">商队</span>
+                    </div>
+                    <div class="sbl-item">
+                        <span class="sbl-icon">🚢</span>
+                        <span class="sbl-name">货船</span>
+                    </div>
+                    <div class="sbl-item">
+                        <span class="sbl-icon">📦</span>
+                        <span class="sbl-name">货物</span>
+                    </div>
+                    <div class="sbl-item">
+                        <span class="sbl-icon">💰</span>
+                        <span class="sbl-name">交易</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部导航 -->
+            <div class="footer-nav commerce-footer">
+                <button class="footer-btn" onclick="location.href='index.html'">
+                    ← 返回首页
+                </button>
+                <button class="footer-btn" onclick="document.getElementById('commerceModule').scrollIntoView({behavior: 'smooth'})">
+                    ↑ 模块一：结构解密
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- 浮层：石墩详情 -->
+    <div class="overlay" id="pierOverlay">
+        <div class="overlay-content">
+            <button class="close-btn" onclick="closeOverlay('pierOverlay')">×</button>
+            <h2 class="overlay-title">🪨 筏形基础 — 石墩构造</h2>
+            
+            <div class="pier-diagram">
+                <div class="layer" style="top: 70%;">
+                    <svg width="100" height="30">
+                        <ellipse cx="50" cy="15" rx="45" ry="12" fill="#5a4a3a"/>
+                    </svg>
+                    <p class="layer-text">松木桩基 · 深入岩层</p>
+                </div>
+                <div class="layer" style="top: 50%;">
+                    <svg width="80" height="35">
+                        <ellipse cx="40" cy="17" rx="38" ry="15" fill="#6b5b4a"/>
+                    </svg>
+                    <p class="layer-text">块石垫层 · 分散压力</p>
+                </div>
+                <div class="layer" style="top: 30%;">
+                    <svg width="60" height="40">
+                        <path d="M 10 0 L 50 0 L 55 30 L 5 30 Z" fill="#7a6a5a"/>
+                    </svg>
+                    <p class="layer-text">花岗岩石墩</p>
+                </div>
+                <div class="layer" style="top: 10%;">
+                    <svg width="80" height="25">
+                        <rect x="5" y="0" width="70" height="15" rx="2" fill="#9a9a8a"/>
+                    </svg>
+                    <p class="layer-text">墩帽 & 石梁</p>
+                </div>
+            </div>
+            
+            <div class="overlay-text">
+                <p>广济桥的石墩采用<strong>筏形基础</strong>技术，这在宋代是极其先进的工艺。</p>
+                <blockquote>
+                    "用松木作桩，入土极深，上铺大石，砌以花岗岩，历数百年不坏。"
+                </blockquote>
+                <p>• <strong>松木桩基</strong>：选用百年松木，耐水防腐，深入河床岩层<br>
+                   • <strong>块石垫层</strong>：分散水流冲刷力，保护桩基<br>
+                   • <strong>花岗岩墩身</strong>：就地取材，抗压耐磨<br>
+                   • <strong>墩帽连接</strong>：承上启下，连接石梁</p>
+            </div>
+            <div class="annotation">
+                注：石墩间距约13米，墩宽不等，最宽处约6米，承受韩江洪水的巨大冲刷力。
+            </div>
+        </div>
+    </div>
+
+    <!-- 浮层：梭船详情 -->
+    <div class="overlay" id="boatsOverlay">
+        <div class="overlay-content">
+            <button class="close-btn" onclick="closeOverlay('boatsOverlay')">×</button>
+            <h2 class="overlay-title">🚢 梭船启闭 — 浮桥动画</h2>
+            
+            <div class="boat-animation" id="boatAnimContainer">
+                <div class="water"></div>
+                <!-- 梭船 -->
+                <div class="boat" id="animBoat1" style="left: 15%;">
+                    <div class="boat-body"></div>
+                </div>
+                <div class="boat" id="animBoat2" style="left: 35%;">
+                    <div class="boat-body"></div>
+                </div>
+                <div class="boat" id="animBoat3" style="left: 55%;">
+                    <div class="boat-body"></div>
+                </div>
+                <div class="boat" id="animBoat4" style="left: 75%;">
+                    <div class="boat-body"></div>
+                </div>
+            </div>
+            
+            <div class="overlay-text">
+                <p>二十四只梭船以<strong>铁缆连贯</strong>，构成可启闭的浮桥段。</p>
+                <blockquote>
+                    "用船二十四只，以铁缆连贯之。潮涨则船浮，可通巨舟；潮落则船落，以通行人。"
+                    —— 《潮州府志》
+                </blockquote>
+                <p>• <strong>闭合状态</strong>：梭船并排相连，形成桥面，连通东西两岸<br>
+                   • <strong>开启过程</strong>：解开铁索，牵引至两侧石墩固定<br>
+                   • <strong>通航时间</strong>：大型船只通过时开启，每日可启闭数次<br>
+                   • <strong>梭船设计</strong>：首尾尖削如梭，便于水流转动</p>
+            </div>
+            <div class="annotation">
+                注：梭船平时用作桥面，开启时只需解开中部铁索，两端绞盘牵引至石墩旁。
+            </div>
+        </div>
+    </div>
+
+    <!-- 浮层：铁索详情 -->
+    <div class="overlay" id="cablesOverlay">
+        <div class="overlay-content">
+            <button class="close-btn" onclick="closeOverlay('cablesOverlay')">×</button>
+            <h2 class="overlay-title">🔗 铁索系统 — 受力原理</h2>
+            
+            <div class="cable-animation">
+                <div class="cable-end left"></div>
+                <div class="cable"></div>
+                <div class="cable-end right"></div>
+            </div>
+            
+            <svg viewBox="0 0 600 200" style="width: 100%; margin: 1rem 0;">
+                <!-- 铁索连接示意图 -->
+                <defs>
+                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#c9a227"/>
+                    </marker>
+                </defs>
+                
+                <!-- 石墩固定点 -->
+                <rect x="50" y="80" width="40" height="60" fill="#7a7a6a" rx="3"/>
+                <text x="70" y="155" font-size="10" text-anchor="middle" fill="#5a5a4a">石墩</text>
+                
+                <!-- 锚定装置 -->
+                <rect x="55" y="85" width="30" height="15" fill="#4a4a4a"/>
+                <circle cx="70" cy="92" r="5" fill="#6a6a6a"/>
+                
+                <!-- 铁索 -->
+                <line x1="85" y1="92" x2="200" y2="60" stroke="#8b4513" stroke-width="4"/>
+                <line x1="85" y1="92" x2="200" y2="60" stroke="#4a4a4a" stroke-width="2"/>
+                
+                <!-- 梭船 -->
+                <path d="M 200 50 L 250 50 L 260 70 L 240 85 L 200 85 L 190 70 Z" fill="#8b4513"/>
+                <text x="225" y="100" font-size="10" text-anchor="middle" fill="#5a5a4a">梭船</text>
+                
+                <!-- 力的箭头 -->
+                <line x1="140" y1="70" x2="180" y2="55" stroke="#c9a227" stroke-width="2" marker-end="url(#arrow)"/>
+                <text x="160" y="50" font-size="9" fill="#c9a227">拉力</text>
+                
+                <!-- 说明文字 -->
+                <text x="300" y="40" font-size="12" fill="#4a4a4a" font-weight="bold">受力分析</text>
+                <text x="300" y="65" font-size="10" fill="#5a5a4a">→ 铁索承受水平拉力</text>
+                <text x="300" y="85" font-size="10" fill="#5a5a4a">→ 石墩提供锚固力</text>
+                <text x="300" y="105" font-size="10" fill="#5a5a4a">→ 梭船被铁索固定定位</text>
+            </svg>
+            
+            <div class="overlay-text">
+                <p>铁索系统是广济桥的"锁钥"核心，将浮桥段牢牢锁定。</p>
+                <blockquote>
+                    "以铁索系于两岸石柱，舟至则解索放行，事后复系如故。"
+                </blockquote>
+                <p>• <strong>主铁索</strong>：直径约3厘米，横跨两岸，承受主要拉力<br>
+                   • <strong>锚定装置</strong>：石墩上凿孔安装铁锚，固定铁索<br>
+                   • <strong>牵引索</strong>：连接梭船与主铁索，传递拉力<br>
+                   • <strong>绞盘系统</strong>：两岸设绞盘，控制铁索松紧</p>
+            </div>
+            <div class="annotation">
+                注：每根铁索由多股铁丝绞合而成，强度极高，能承受数百吨拉力而不断裂。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取所有热点元素
+        const hotspots = document.querySelectorAll('.hotspot');
+        const boatHotspot = document.getElementById('boats');
+        const pierHotspots = document.querySelectorAll('[data-type="pier"]');
+        const cableHotspot = document.getElementById('cables');
+        
+        // 动画状态
+        let isAnimating = false;
+        
+        // 热点点击事件
+        hotspots.forEach(hotspot => {
+            hotspot.addEventListener('click', function() {
+                const type = this.dataset.type;
+                
+                // 添加激活效果
+                this.classList.add('active');
+                
+                // 显示对应的浮层
+                if (type === 'pier') {
+                    showOverlay('pierOverlay');
+                } else if (type === 'boats') {
+                    showOverlay('boatsOverlay');
+                    if (!isAnimating) {
+                        startBoatAnimation();
+                    }
+                } else if (type === 'cables') {
+                    showOverlay('cablesOverlay');
+                }
+            });
+            
+            hotspot.addEventListener('mouseenter', function() {
+                const circle = this.querySelector('.hotspot-circle');
+                if (circle) {
+                    circle.style.opacity = '1';
+                }
+            });
+            
+            hotspot.addEventListener('mouseleave', function() {
+                const circle = this.querySelector('.hotspot-circle');
+                if (circle && !this.classList.contains('active')) {
+                    circle.style.opacity = '0';
+                }
+            });
+        });
+        
+        // 显示浮层
+        function showOverlay(overlayId) {
+            const overlay = document.getElementById(overlayId);
+            overlay.classList.add('active');
+        }
+        
+        // 关闭浮层
+        function closeOverlay(overlayId) {
+            const overlay = document.getElementById(overlayId);
+            overlay.classList.remove('active');
+            
+            // 移除热点激活状态
+            hotspots.forEach(h => h.classList.remove('active'));
+            pierHotspots.forEach(h => h.classList.remove('active'));
+        }
+        
+        // 梭船动画
+        function startBoatAnimation() {
+            isAnimating = true;
+            const boats = [
+                document.getElementById('animBoat1'),
+                document.getElementById('animBoat2'),
+                document.getElementById('animBoat3'),
+                document.getElementById('animBoat4')
+            ];
+            
+            // 初始状态：闭合（中间聚集）
+            boats.forEach((boat, index) => {
+                boat.style.transition = 'all 2s cubic-bezier(0.4, 0, 0.2, 1)';
+            });
+            
+            // 延迟开启动画
+            setTimeout(() => {
+                // 开启：分散到两侧
+                boats[0].style.transform = 'translateX(-120px)';
+                boats[1].style.transform = 'translateX(-40px)';
+                boats[2].style.transform = 'translateX(40px)';
+                boats[3].style.transform = 'translateX(120px)';
+            }, 500);
+            
+            // 重新闭合
+            setTimeout(() => {
+                boats.forEach(boat => {
+                    boat.style.transform = 'translateX(0)';
+                });
+            }, 3500);
+            
+            // 动画完成
+            setTimeout(() => {
+                isAnimating = false;
+            }, 5500);
+        }
+        
+        // 点击浮层外部关闭
+        document.querySelectorAll('.overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeOverlay(this.id);
+                }
+            });
+        });
+        
+        // ESC键关闭浮层
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.overlay.active').forEach(overlay => {
+                    closeOverlay(overlay.id);
+                });
+            }
+        });
+        
+        // 重新播放按钮
+        document.getElementById('replayBtn').addEventListener('click', function() {
+            showOverlay('boatsOverlay');
+            if (!isAnimating) {
+                startBoatAnimation();
+            }
+        });
+        
+        // 页面加载时添加进入动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const svg = document.querySelector('.blueprint-svg');
+            svg.style.opacity = '0';
+            svg.style.transform = 'translateY(20px)';
+            svg.style.transition = 'all 0.8s ease';
+            
+            setTimeout(() => {
+                svg.style.opacity = '1';
+                svg.style.transform = 'translateY(0)';
+            }, 300);
+        });
+
+        // ==================== 模块二：商贸数据交互 ====================
+        // 业态数据配置
+        const commerceData = {
+            1: {
+                icon: '🍵',
+                category: '餐饮服务',
+                name: '东岸茶楼',
+                description: '东岸桥头第一家，迎送往来客商。潮州功夫茶在此兴起，成为商洽谈生意、休憩会友的重要场所。',
+                stats: [
+                    { label: '日均客流量', value: '500+', percent: 45 },
+                    { label: '年营业额(两)', value: '8,000', percent: 60 }
+                ],
+                poetry: '潮州湘桥好风流，十八梭船廿四洲。廿四楼台廿四样，两只鉎牛一只溜。',
+                poetrySource: '—— 潮州竹枝词'
+            },
+            2: {
+                icon: '🏺',
+                category: '陶瓷外销',
+                name: '瓷庄汇珍',
+                description: '专营潮州窑口精品瓷器，品类繁多，畅销海内外。潮州窑为宋代五大名窑之一，所产瓷器远销东南亚。',
+                stats: [
+                    { label: '年出口量(万件)', value: '12', percent: 75 },
+                    { label: '占海外市场', value: '15%', percent: 55 }
+                ],
+                poetry: '海滨邹鲁产名瓷，釉色青白世所稀。商贾云集桥头上，一船瓷器一船金。',
+                poetrySource: '——《潮州陶瓷志》'
+            },
+            3: {
+                icon: '🎨',
+                category: '手工艺品',
+                name: '潮绣雅集',
+                description: '汇集潮州刺绣、木雕、麦秆画等手工艺品。潮绣以"金碧饱满、构图精巧"著称，为贡品之选。',
+                stats: [
+                    { label: '匠人数量', value: '200+', percent: 35 },
+                    { label: '年产值(两)', value: '5,000', percent: 40 }
+                ],
+                poetry: '银针金线绣凤凰，巧夺天工技艺长。桥上绣娘穿针处，满城贵妇竞新妆。',
+                poetrySource: '—— 清代潮州竹枝词'
+            },
+            4: {
+                icon: '🥋',
+                category: '纺织绸缎',
+                name: '绸缎庄',
+                description: '经销潮州丝绸、苎布，兼营各地名绸。潮州素有"海滨丝路"之称，纺织业历史悠久。',
+                stats: [
+                    { label: '年销量(匹)', value: '3,000', percent: 50 },
+                    { label: '产值占比', value: '12%', percent: 42 }
+                ],
+                poetry: '机杼声声日夜忙，丝绸满架映华堂。商客远来采购去，一匹轻纱万两银。',
+                poetrySource: '——《潮州府志》'
+            },
+            5: {
+                icon: '💊',
+                category: '药材贸易',
+                name: '南北药行',
+                description: '集散南北药材，潮州为粤东药材交易中心。桥上药铺林立，方便往来商旅采购。',
+                stats: [
+                    { label: '药材种类', value: '800+', percent: 60 },
+                    { label: '年交易额(两)', value: '15,000', percent: 70 }
+                ],
+                poetry: '南北药材汇此间，丸散膏丹尽齐全。桥头药香飘十里，悬壶济世美名传。',
+                poetrySource: '—— 潮州药商口述'
+            },
+            6: {
+                icon: '🍶',
+                category: '日用杂货',
+                name: '百货墟市',
+                description: '针头线脑、日用百货，应有尽有。桥上集市繁华程度堪比州城，为潮州最热闹的商业区之一。',
+                stats: [
+                    { label: '摊位数量', value: '120', percent: 80 },
+                    { label: '日均交易', value: '2,000', percent: 65 }
+                ],
+                poetry: '一里长桥一里市，千家万户百业兴。人潮涌动如潮水，日落收市待天明。',
+                poetrySource: '—— 清《潮州风俗考》'
+            },
+            7: {
+                icon: '⚓',
+                category: '航运服务',
+                name: '船运客栈',
+                description: '为往来船家提供食宿、货物寄存服务。韩江航运繁忙，桥头客栈日夜迎送南来北往的客商。',
+                stats: [
+                    { label: '日均接待', value: '300人', percent: 55 },
+                    { label: '住宿容量', value: '80间', percent: 45 }
+                ],
+                poetry: '韩江千里通南北，船客相逢桥上栖。一盏清茶话别去，明朝重聚续前题。',
+                poetrySource: '—— 潮州竹枝词'
+            },
+            8: {
+                icon: '💰',
+                category: '金融汇兑',
+                name: '钱庄银号',
+                description: '潮州为粤东金融中心，桥上钱庄办理汇兑、存款、放款业务，为商户提供便捷的金融服务。',
+                stats: [
+                    { label: '日均汇兑(万两)', value: '5', percent: 70 },
+                    { label: '年利润(两)', value: '20,000', percent: 85 }
+                ],
+                poetry: '银号钱庄次第开，汇通天下聚财来。桥上金融连四海，金银流动如江河。',
+                poetrySource: '——《潮州金融史》'
+            },
+            9: {
+                icon: '📚',
+                category: '书墨文房',
+                name: '书斋墨庄',
+                description: '经营书籍、笔墨、纸张，兼营字画。潮州文风鼎盛，读书人众多，文房用品需求旺盛。',
+                stats: [
+                    { label: '书籍种类', value: '5,000+', percent: 40 },
+                    { label: '年销售额(两)', value: '3,000', percent: 35 }
+                ],
+                poetry: '书香墨韵满桥头，士子云集品艺幽。一卷诗书千两价，文风昌盛甲潮州。',
+                poetrySource: '—— 清代潮州文教志'
+            },
+            10: {
+                icon: '🥢',
+                category: '餐饮服务',
+                name: '酒肆食肆',
+                description: '潮州菜闻名遐迩，桥上酒肆汇聚各地风味。商人宴请宾客、洽谈生意，多在此处进行。',
+                stats: [
+                    { label: '日均翻台', value: '200次', percent: 60 },
+                    { label: '年营收(两)', value: '12,000', percent: 68 }
+                ],
+                poetry: '潮州美食甲天下，佳肴美酒待嘉宾。桥上举杯邀明月，酒香飘过韩江滨。',
+                poetrySource: '——《潮州菜谱》'
+            },
+            11: {
+                icon: '🔨',
+                category: '手工艺品',
+                name: '五金作坊',
+                description: '打造铁器、铜器、锡器等日用金属制品。潮州手工艺人技艺精湛，产品远销各地。',
+                stats: [
+                    { label: '匠铺数量', value: '30', percent: 30 },
+                    { label: '年产值(两)', value: '2,500', percent: 28 }
+                ],
+                poetry: '叮叮当当锤声忙，铁匠炉火照夕阳。刀剪锅勺皆精巧，行销海内美名扬。',
+                poetrySource: '—— 潮州手工业志'
+            },
+            12: {
+                icon: '🏠',
+                category: '管理调度',
+                name: '桥务公所',
+                description: '管理桥上事务，协调商户经营，处理日常纠纷。广济桥设专职桥头，负责启闭浮桥。',
+                stats: [
+                    { label: '管辖商户', value: '180', percent: 90 },
+                    { label: '年收取桥费(两)', value: '6,000', percent: 75 }
+                ],
+                poetry: '桥头公所镇中央，一桥横跨两州坊。收管有序商贾服，百年基业永流芳。',
+                poetrySource: '——《广济桥志》'
+            }
+        };
+
+        // 初始化热力图交互
+        function initCommerceModule() {
+            const zhouBlocks = document.querySelectorAll('.zhou-block');
+            const panelContent = document.getElementById('panelContent');
+            const panelTitle = document.getElementById('panelTitle');
+            const panelIcon = document.getElementById('panelIcon');
+            const panelFooter = document.getElementById('panelFooter');
+
+            zhouBlocks.forEach(block => {
+                block.addEventListener('click', function() {
+                    const zhouNum = parseInt(this.dataset.zhou);
+                    
+                    // 移除其他激活状态
+                    zhouBlocks.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // 获取数据
+                    const data = commerceData[zhouNum] || commerceData[1];
+
+                    // 更新面板
+                    panelIcon.textContent = data.icon;
+                    panelTitle.textContent = data.name;
+
+                    // 生成详情HTML
+                    let statsHTML = '<div class="stats-section"><div class="stats-title">商业数据统计</div>';
+                    data.stats.forEach(stat => {
+                        statsHTML += `
+                            <div class="stat-item">
+                                <span class="stat-label">${stat.label}</span>
+                                <span class="stat-value">${stat.value}</span>
+                            </div>
+                            <div class="stat-bar">
+                                <div class="stat-bar-fill" style="width: ${stat.percent}%"></div>
+                            </div>
+                        `;
+                    });
+                    statsHTML += '</div>';
+
+                    const detailHTML = `
+                        <div class="detail-card">
+                            <div class="shop-category">${data.category}</div>
+                            <h3 class="shop-name">${data.name}</h3>
+                            <p class="shop-description">${data.description}</p>
+                            ${statsHTML}
+                        </div>
+                    `;
+
+                    panelContent.innerHTML = detailHTML;
+
+                    // 更新诗歌卡片
+                    panelFooter.innerHTML = `
+                        <div class="poetry-card">
+                            <p class="poetry-text">"${data.poetry}"</p>
+                            <p class="poetry-source">${data.poetrySource}</p>
+                        </div>
+                    `;
+
+                    // 添加动画效果
+                    const statBars = panelContent.querySelectorAll('.stat-bar-fill');
+                    statBars.forEach((bar, index) => {
+                        setTimeout(() => {
+                            bar.style.width = data.stats[index].percent + '%';
+                        }, 100 + index * 100);
+                    });
+                });
+            });
+
+            // 默认激活第一个区块
+            setTimeout(() => {
+                const firstBlock = document.querySelector('[data-zhou="1"]');
+                if (firstBlock) {
+                    firstBlock.click();
+                }
+            }, 500);
+        }
+
+        // 页面加载完成后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initCommerceModule);
+        } else {
+            initCommerceModule();
+        }
+
+        // ==================== 动态商贸沙盘 ====================
+        class CommerceSandbox {
+            constructor() {
+                this.canvas = document.getElementById('sandboxCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.isRunning = false;
+                this.speed = 1;
+                this.animationId = null;
+                
+                // 数据统计
+                this.stats = {
+                    dailyFlow: 0,
+                    dailyTrade: 0,
+                    dailyRevenue: 0,
+                    dailyShips: 0
+                };
+                
+                // 实体列表
+                this.entities = [];
+                this.trades = [];
+                this.particles = [];
+                
+                // 桥面区域
+                this.bridgeArea = { x: 100, y: 180, width: 800, height: 120 };
+                
+                // 店铺位置
+                this.shops = [
+                    { x: 150, y: 200, type: 'tea', name: '茶楼', icon: '🍵' },
+                    { x: 250, y: 200, type: 'ceramic', name: '瓷庄', icon: '🏺' },
+                    { x: 350, y: 200, type: 'craft', name: '绣庄', icon: '🎨' },
+                    { x: 450, y: 200, type: 'silk', name: '绸缎', icon: '🥋' },
+                    { x: 550, y: 200, type: 'medicine', name: '药行', icon: '💊' },
+                    { x: 650, y: 200, type: 'misc', name: '杂货', icon: '🍶' },
+                    { x: 750, y: 200, type: 'manage', name: '公所', icon: '🏠' }
+                ];
+                
+                // 初始化
+                this.resize();
+                this.bindEvents();
+            }
+            
+            resize() {
+                const rect = this.canvas.getBoundingClientRect();
+                this.canvas.width = rect.width * 2;
+                this.canvas.height = rect.height * 2;
+                this.ctx.scale(2, 2);
+                this.displayWidth = rect.width;
+                this.displayHeight = rect.height;
+            }
+            
+            bindEvents() {
+                window.addEventListener('resize', () => this.resize());
+                
+                document.getElementById('playPauseBtn').addEventListener('click', () => {
+                    this.toggle();
+                });
+                
+                document.getElementById('speedBtn').addEventListener('click', () => {
+                    this.cycleSpeed();
+                });
+                
+                document.getElementById('resetBtn').addEventListener('click', () => {
+                    this.reset();
+                });
+            }
+            
+            toggle() {
+                this.isRunning = !this.isRunning;
+                const btn = document.getElementById('playPauseBtn');
+                const icon = btn.querySelector('.btn-icon');
+                const text = btn.querySelector('.btn-text');
+                
+                if (this.isRunning) {
+                    btn.classList.add('active');
+                    icon.textContent = '⏸';
+                    text.textContent = '暂停';
+                    this.start();
+                } else {
+                    btn.classList.remove('active');
+                    icon.textContent = '▶';
+                    text.textContent = '开始模拟';
+                    this.stop();
+                }
+            }
+            
+            cycleSpeed() {
+                const speeds = [1, 2, 4];
+                const speedLabels = ['1x', '2x', '4x'];
+                const currentIndex = speeds.indexOf(this.speed);
+                this.speed = speeds[(currentIndex + 1) % speeds.length];
+                
+                const btn = document.getElementById('speedBtn');
+                btn.querySelector('.btn-text').textContent = `速度: ${this.speedLabels[(currentIndex + 1) % 3]}`;
+            }
+            
+            reset() {
+                this.stats = { dailyFlow: 0, dailyTrade: 0, dailyRevenue: 0, dailyShips: 0 };
+                this.entities = [];
+                this.trades = [];
+                this.particles = [];
+                this.updateStats();
+                this.addLog('系统已重置，开始新模拟...', 'reset');
+            }
+            
+            start() {
+                this.lastTime = performance.now();
+                this.spawnTimer = 0;
+                this.tradeTimer = 0;
+                this.loop();
+            }
+            
+            stop() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+            }
+            
+            loop(currentTime = performance.now()) {
+                if (!this.isRunning) return;
+                
+                const deltaTime = (currentTime - this.lastTime) * this.speed;
+                this.lastTime = currentTime;
+                
+                this.update(deltaTime);
+                this.render();
+                
+                this.animationId = requestAnimationFrame((t) => this.loop(t));
+            }
+            
+            update(dt) {
+                // 生成新实体
+                this.spawnTimer += dt;
+                if (this.spawnTimer > 2000 / this.speed) {
+                    this.spawnEntity();
+                    this.spawnTimer = 0;
+                }
+                
+                // 更新实体
+                this.entities.forEach(entity => {
+                    entity.x += entity.vx * dt * 0.01;
+                    entity.y += entity.vy * dt * 0.01;
+                    entity.life -= dt;
+                    
+                    // 边界检测
+                    if (entity.x < 50 || entity.x > this.displayWidth - 50) {
+                        entity.vx *= -1;
+                    }
+                    
+                    // 店铺检测
+                    this.shops.forEach(shop => {
+                        const dist = Math.abs(entity.x - shop.x) + Math.abs(entity.y - shop.y);
+                        if (dist < 30 && Math.random() < 0.02 * this.speed) {
+                            this.createTrade(entity, shop);
+                        }
+                    });
+                });
+                
+                // 移除过期实体
+                this.entities = this.entities.filter(e => e.life > 0);
+                
+                // 更新粒子
+                this.particles.forEach(p => {
+                    p.x += p.vx * dt * 0.01;
+                    p.y += p.vy * dt * 0.01;
+                    p.life -= dt;
+                    p.alpha = Math.max(0, p.life / 1000);
+                });
+                this.particles = this.particles.filter(p => p.life > 0);
+                
+                // 更新交易
+                this.trades = this.trades.filter(t => {
+                    t.progress += dt * 0.001;
+                    return t.progress < 1;
+                });
+                
+                // 更新统计数据
+                this.updateStats();
+                
+                // 随机添加日志
+                this.tradeTimer += dt;
+                if (this.tradeTimer > 5000 / this.speed && this.stats.dailyTrade > 0) {
+                    this.randomLog();
+                    this.tradeTimer = 0;
+                }
+            }
+            
+            spawnEntity() {
+                const types = ['pedestrian', 'merchant', 'ship'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                
+                const entity = {
+                    type,
+                    x: Math.random() * (this.displayWidth - 200) + 100,
+                    y: type === 'ship' ? this.displayHeight - 60 : this.bridgeArea.y + Math.random() * 60,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: type === 'ship' ? 0 : (Math.random() - 0.5) * 0.5,
+                    life: 10000 + Math.random() * 5000,
+                    direction: Math.random() > 0.5 ? 1 : -1,
+                    color: this.getEntityColor(type)
+                };
+                
+                entity.vx *= entity.direction;
+                
+                this.entities.push(entity);
+                this.stats.dailyFlow++;
+                
+                // 船只计数
+                if (type === 'ship') {
+                    this.stats.dailyShips++;
+                    this.addLog(`🚢 货船经桥下通行`, 'ship');
+                }
+            }
+            
+            getEntityColor(type) {
+                const colors = {
+                    pedestrian: '#8B4513',
+                    merchant: '#2C5F7C',
+                    ship: '#4A4A4A'
+                };
+                return colors[type] || '#000';
+            }
+            
+            createTrade(entity, shop) {
+                const amount = Math.floor(Math.random() * 100) + 10;
+                this.stats.dailyTrade++;
+                this.stats.dailyRevenue += amount;
+                
+                const trade = {
+                    x: shop.x,
+                    y: shop.y - 20,
+                    amount,
+                    shop: shop.name,
+                    progress: 0
+                };
+                this.trades.push(trade);
+                
+                // 创建粒子效果
+                for (let i = 0; i < 5; i++) {
+                    this.particles.push({
+                        x: shop.x,
+                        y: shop.y,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: -Math.random() * 2 - 1,
+                        color: '#FFD700',
+                        life: 1000,
+                        alpha: 1
+                    });
+                }
+                
+                this.addLog(`${shop.icon} ${shop.name}成交 ${amount} 两`, 'trade');
+            }
+            
+            addLog(message, type = 'info') {
+                const logContent = document.getElementById('logContent');
+                if (!logContent) return;
+                
+                const now = new Date();
+                const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item';
+                logItem.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-${type}">${message}</span>`;
+                
+                logContent.insertBefore(logItem, logContent.firstChild);
+                
+                // 保留最近的20条日志
+                while (logContent.children.length > 20) {
+                    logContent.removeChild(logContent.lastChild);
+                }
+            }
+            
+            randomLog() {
+                const logs = [
+                    '📦 新到一批潮州瓷器',
+                    '🐎 商队抵达桥头',
+                    '🍵 茶楼迎来送往',
+                    '💊 药材装船运往海外',
+                    '🥋 绸缎热销中',
+                    '🎨 工艺品被游客采购',
+                    '🌊 潮水涨起，船只通行',
+                    '👥 桥上行人如织'
+                ];
+                const log = logs[Math.floor(Math.random() * logs.length)];
+                this.addLog(log, 'info');
+            }
+            
+            updateStats() {
+                document.getElementById('dailyFlow').textContent = this.stats.dailyFlow.toLocaleString();
+                document.getElementById('dailyTrade').textContent = this.stats.dailyTrade.toLocaleString();
+                document.getElementById('dailyRevenue').textContent = this.stats.dailyRevenue.toLocaleString();
+                document.getElementById('dailyShips').textContent = this.stats.dailyShips.toLocaleString();
+            }
+            
+            render() {
+                const ctx = this.ctx;
+                const w = this.displayWidth;
+                const h = this.displayHeight;
+                
+                // 清空画布
+                ctx.clearRect(0, 0, w, h);
+                
+                // 绘制天空渐变
+                const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+                skyGrad.addColorStop(0, '#87CEEB');
+                skyGrad.addColorStop(0.5, '#B0E0E6');
+                skyGrad.addColorStop(1, '#98D8C8');
+                ctx.fillStyle = skyGrad;
+                ctx.fillRect(0, 0, w, h);
+                
+                // 绘制远山
+                ctx.fillStyle = 'rgba(100, 120, 100, 0.3)';
+                ctx.beginPath();
+                ctx.moveTo(0, h * 0.4);
+                ctx.quadraticCurveTo(w * 0.3, h * 0.3, w * 0.5, h * 0.35);
+                ctx.quadraticCurveTo(w * 0.7, h * 0.32, w, h * 0.38);
+                ctx.lineTo(w, h * 0.4);
+                ctx.fill();
+                
+                // 绘制河流
+                const waterGrad = ctx.createLinearGradient(0, h * 0.65, 0, h);
+                waterGrad.addColorStop(0, '#5F9EA0');
+                waterGrad.addColorStop(1, '#4682B4');
+                ctx.fillStyle = waterGrad;
+                ctx.fillRect(0, h * 0.65, w, h * 0.35);
+                
+                // 绘制水波纹
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < 10; i++) {
+                    const y = h * 0.7 + i * 15;
+                    ctx.beginPath();
+                    for (let x = 0; x < w; x += 20) {
+                        const waveY = y + Math.sin((x + Date.now() * 0.002) * 0.02) * 3;
+                        if (x === 0) ctx.moveTo(x, waveY);
+                        else ctx.lineTo(x, waveY);
+                    }
+                    ctx.stroke();
+                }
+                
+                // 绘制桥面
+                const bridgeGrad = ctx.createLinearGradient(0, this.bridgeArea.y, 0, this.bridgeArea.y + this.bridgeArea.height);
+                bridgeGrad.addColorStop(0, '#D4C4A8');
+                bridgeGrad.addColorStop(1, '#C4B498');
+                ctx.fillStyle = bridgeGrad;
+                ctx.fillRect(this.bridgeArea.x, this.bridgeArea.y, this.bridgeArea.width, this.bridgeArea.height);
+                
+                // 绘制桥栏杆
+                ctx.strokeStyle = '#5A4A3A';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(this.bridgeArea.x, this.bridgeArea.y);
+                ctx.lineTo(this.bridgeArea.x + this.bridgeArea.width, this.bridgeArea.y);
+                ctx.moveTo(this.bridgeArea.x, this.bridgeArea.y + this.bridgeArea.height);
+                ctx.lineTo(this.bridgeArea.x + this.bridgeArea.width, this.bridgeArea.y + this.bridgeArea.height);
+                ctx.stroke();
+                
+                // 绘制栏杆柱
+                ctx.fillStyle = '#5A4A3A';
+                for (let x = this.bridgeArea.x + 30; x < this.bridgeArea.x + this.bridgeArea.width; x += 80) {
+                    ctx.fillRect(x, this.bridgeArea.y - 10, 8, 15);
+                    ctx.fillRect(x, this.bridgeArea.y + this.bridgeArea.height - 5, 8, 15);
+                }
+                
+                // 绘制店铺
+                this.shops.forEach(shop => {
+                    // 店铺底座
+                    ctx.fillStyle = 'rgba(139, 69, 19, 0.3)';
+                    ctx.fillRect(shop.x - 25, shop.y - 5, 50, 20);
+                    
+                    // 店铺图标
+                    ctx.font = '24px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(shop.icon, shop.x, shop.y + 5);
+                });
+                
+                // 绘制实体
+                this.entities.forEach(entity => {
+                    ctx.textAlign = 'center';
+                    
+                    switch(entity.type) {
+                        case 'pedestrian':
+                            ctx.font = '16px Arial';
+                            ctx.fillText('🚶', entity.x, entity.y);
+                            break;
+                        case 'merchant':
+                            ctx.font = '18px Arial';
+                            // 方向
+                            const scaleX = entity.direction;
+                            ctx.save();
+                            ctx.translate(entity.x, entity.y);
+                            ctx.scale(scaleX, 1);
+                            ctx.fillText('🐎', 0, 0);
+                            ctx.restore();
+                            break;
+                        case 'ship':
+                            ctx.font = '28px Arial';
+                            ctx.fillText('🚢', entity.x, entity.y);
+                            break;
+                    }
+                });
+                
+                // 绘制交易动画
+                this.trades.forEach(trade => {
+                    const alpha = 1 - trade.progress;
+                    ctx.globalAlpha = alpha;
+                    ctx.font = 'bold 14px IBM Plex Mono';
+                    ctx.fillStyle = '#FFD700';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`+${trade.amount}两`, trade.x, trade.y - 30 * trade.progress);
+                    ctx.globalAlpha = 1;
+                });
+                
+                // 绘制粒子
+                this.particles.forEach(p => {
+                    ctx.globalAlpha = p.alpha;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1;
+                
+                // 绘制东岸和西岸标签
+                ctx.font = '12px IBM Plex Mono';
+                ctx.fillStyle = '#5A4A3A';
+                ctx.textAlign = 'center';
+                ctx.fillText('韩山 · 东岸', 100, this.bridgeArea.y - 30);
+                ctx.fillText('金山 · 西岸', w - 100, this.bridgeArea.y - 30);
+                
+                // 绘制标题文字
+                ctx.font = 'bold 16px Ma Shan Zheng';
+                ctx.fillStyle = 'rgba(139, 69, 19, 0.8)';
+                ctx.fillText('广济桥 · 商贸沙盘', w / 2, 30);
+            }
+        }
+
+        // 初始化沙盘
+        let sandbox;
+        function initSandbox() {
+            if (document.getElementById('sandboxCanvas')) {
+                sandbox = new CommerceSandbox();
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initCommerceModule();
+            initSandbox();
+        });
+    </script>
+</body>
+</html>
+

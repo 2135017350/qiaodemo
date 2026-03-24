@@ -1,0 +1,1821 @@
+/* ============================================
+   卢沟桥石狮风格谱系 - 样式表
+   第一部分：凝固的艺术
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Ma+Shan+Zheng&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --ink: #1a1a1a;
+    --ink-light: #4a4a4a;
+    --paper: #f5f0e6;
+    --paper-dark: #e8e0d0;
+    --gold: #c9a227;
+    --gold-light: #e8d5a0;
+    --stone: #8b8680;
+    --stone-light: #a0a0a0;
+    --stone-dark: #5a5a5a;
+    --bronze: #8b6914;
+    --rust: #8b4513;
+    --shadow: rgba(0, 0, 0, 0.15);
+    --glow: rgba(201, 162, 39, 0.4);
+    
+    /* 朝代主题色 */
+    --jin-color: #8B0000;
+    --yuan-color: #2E8B57;
+    --ming-color: #191970;
+    --qing-color: #8B4513;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Serif SC', serif;
+    background: var(--paper);
+    color: var(--ink);
+    overflow-x: hidden;
+}
+
+/* ============================================
+   主容器与导航
+   ============================================ */
+.lugou-container {
+    min-height: 100vh;
+    position: relative;
+}
+
+/* 顶部导航 */
+.top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(180deg, var(--ink) 0%, rgba(26, 26, 26, 0.95) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.nav-brand {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.5rem;
+    color: var(--gold);
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--paper);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    opacity: 1;
+    color: var(--gold);
+}
+
+/* 返回首页按钮 */
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(201, 162, 39, 0.2);
+    border: 1px solid var(--gold);
+    border-radius: 20px;
+    color: var(--gold);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.back-btn:hover {
+    background: var(--gold);
+    color: var(--ink);
+}
+
+/* ============================================
+   主标题区域
+   ============================================ */
+.hero-section {
+    padding: 120px 2rem 4rem;
+    text-align: center;
+    background: 
+        radial-gradient(ellipse at 20% 30%, rgba(201, 162, 39, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(139, 105, 20, 0.05) 0%, transparent 50%),
+        linear-gradient(180deg, transparent 0%, var(--paper) 100%);
+    position: relative;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.main-title {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--ink) 0%, var(--rust) 50%, var(--bronze) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.1em;
+}
+
+.subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    color: var(--ink-light);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+}
+
+.hero-description {
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 1.1rem;
+    line-height: 2;
+    color: var(--ink-light);
+    text-align: center;
+}
+
+.hero-description br {
+    margin-bottom: 0.5rem;
+}
+
+/* ============================================
+   朝代演变时间线
+   ============================================ */
+.timeline-section {
+    max-width: 1400px;
+    margin: 0 auto 3rem;
+    padding: 0 2rem;
+}
+
+.演变时间线 {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.8rem;
+    color: var(--ink);
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.演变时间线::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--gold);
+    margin: 1rem auto 0;
+}
+
+.dynasty-timeline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.timeline-item-expanded {
+    background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,240,230,0.98) 100%);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(201, 162, 39, 0.2);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.timeline-item-expanded:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+}
+
+.dynasty-banner {
+    padding: 1.5rem;
+    color: white;
+    text-align: center;
+}
+
+.dynasty-banner.jin-banner {
+    background: linear-gradient(135deg, var(--jin-color) 0%, #a52a2a 100%);
+}
+
+.dynasty-banner.yuan-banner {
+    background: linear-gradient(135deg, var(--yuan-color) 0%, #3cb371 100%);
+}
+
+.dynasty-banner.ming-banner {
+    background: linear-gradient(135deg, var(--ming-color) 0%, #4169e1 100%);
+}
+
+.dynasty-banner.qing-banner {
+    background: linear-gradient(135deg, var(--qing-color) 0%, #cd853f 100%);
+}
+
+.dynasty-era {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.8rem;
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.dynasty-years {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.dynasty-content {
+    padding: 1.5rem;
+}
+
+.dynasty-theme {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.2rem;
+    color: var(--ink);
+    margin-bottom: 0.8rem;
+    text-align: center;
+}
+
+.dynasty-desc {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: var(--ink-light);
+    margin-bottom: 1rem;
+    text-align: justify;
+}
+
+.dynasty-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.feature-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(201, 162, 39, 0.15);
+    color: var(--bronze);
+    border-radius: 15px;
+}
+
+/* ============================================
+   主内容区域
+   ============================================ */
+.main-content {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* ============================================
+   侧边筛选器
+   ============================================ */
+.sidebar {
+    position: sticky;
+    top: 80px;
+    height: fit-content;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(245,240,230,0.95) 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(201, 162, 39, 0.2);
+    box-shadow: 
+        0 10px 40px var(--shadow),
+        inset 0 0 0 1px rgba(201, 162, 39, 0.1);
+}
+
+.filter-section {
+    margin-bottom: 2rem;
+}
+
+.filter-section:last-child {
+    margin-bottom: 0;
+}
+
+.filter-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-title::before {
+    content: '';
+    width: 20px;
+    height: 2px;
+    background: var(--gold);
+}
+
+.filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.7rem 1rem;
+    background: var(--paper);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.filter-option:hover {
+    background: rgba(201, 162, 39, 0.1);
+    border-color: rgba(201, 162, 39, 0.3);
+}
+
+.filter-option.active {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--bronze) 100%);
+    color: white;
+    border-color: var(--gold);
+}
+
+.filter-option input {
+    display: none;
+}
+
+.filter-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--ink-light);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.filter-option.active .filter-checkbox {
+    background: white;
+    border-color: white;
+}
+
+.filter-option.active .filter-checkbox::after {
+    content: '✓';
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.filter-label {
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+.filter-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--ink-light);
+    background: rgba(0,0,0,0.05);
+    padding: 0.2rem 0.5rem;
+    border-radius: 10px;
+}
+
+/* ============================================
+   时间滑动条 · 时间滤镜
+   ============================================ */
+.time-slider-container {
+    max-width: 1000px;
+    margin: 2rem auto 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(245,240,230,0.95) 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(201, 162, 39, 0.2);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+}
+
+.time-slider-track {
+    position: relative;
+    height: 80px;
+    margin-bottom: 1rem;
+}
+
+.time-slider-progress {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 0%;
+    height: 6px;
+    background: linear-gradient(90deg, var(--jin-color), var(--yuan-color), var(--ming-color), var(--qing-color));
+    border-radius: 3px;
+    transform: translateY(-50%);
+    transition: width 0.1s ease;
+}
+
+.time-slider-labels {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+
+.slider-label {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.1rem;
+    color: var(--ink-light);
+    transition: all 0.3s ease;
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+}
+
+.slider-label.active {
+    color: var(--ink);
+    background: rgba(201, 162, 39, 0.15);
+    transform: scale(1.1);
+}
+
+.time-slider {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: transparent;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.time-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0;
+    height: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.time-slider::-moz-range-thumb {
+    width: 0;
+    height: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.time-slider-thumb {
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: grab;
+    transition: left 0.1s ease;
+    z-index: 20;
+}
+
+.time-slider-thumb:active {
+    cursor: grabbing;
+}
+
+.thumb-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    animation: dragonFloat 2s ease-in-out infinite;
+}
+
+@keyframes dragonFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.thumb-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: var(--gold);
+    color: var(--ink);
+    border-radius: 12px;
+    margin-top: 0.5rem;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(201, 162, 39, 0.4);
+}
+
+.slider-instruction {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--ink-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.instruction-icon {
+    font-size: 1.2rem;
+    animation: slideLeft 1.5s ease-in-out infinite;
+}
+
+@keyframes slideLeft {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(10px); }
+}
+
+/* ============================================
+   演变对比展示
+   ============================================ */
+.evolution-comparison {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(201, 162, 39, 0.05) 0%, rgba(139, 105, 20, 0.1) 100%);
+    border-radius: 16px;
+}
+
+.evo-lion-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    opacity: 0.4;
+    transform: scale(0.9);
+}
+
+.evo-lion-card.active {
+    opacity: 1;
+    transform: scale(1);
+    border-color: var(--gold);
+    box-shadow: 0 10px 40px rgba(201, 162, 39, 0.2);
+}
+
+.evo-lion-card.dimmed {
+    opacity: 0.2;
+    filter: grayscale(0.8);
+}
+
+.evo-lion-visual {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 0.8rem;
+}
+
+.evo-lion-svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    transition: transform 0.3s ease;
+}
+
+.evo-lion-card:hover .evo-lion-svg {
+    transform: scale(1.1);
+}
+
+.evo-lion-info {
+    text-align: center;
+}
+
+.evo-era-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 10px;
+    color: white;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+}
+
+.evo-era-badge.jin { background: var(--jin-color); }
+.evo-era-badge.yuan { background: var(--yuan-color); }
+.evo-era-badge.ming { background: var(--ming-color); }
+.evo-era-badge.qing { background: var(--qing-color); }
+
+.evo-title {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1rem;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+}
+
+.evo-desc {
+    font-size: 0.75rem;
+    color: var(--ink-light);
+    line-height: 1.4;
+}
+
+.evo-arrow {
+    font-size: 2rem;
+    color: var(--gold);
+    animation: arrowPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes arrowPulse {
+    0%, 100% { opacity: 0.5; transform: translateX(0); }
+    50% { opacity: 1; transform: translateX(5px); }
+}
+
+/* ============================================
+   风格特征高亮区
+   ============================================ */
+.feature-highlight-zone {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+}
+
+.highlight-card {
+    background: rgba(255,255,255,0.9);
+    border-radius: 12px;
+    padding: 1.2rem;
+    text-align: center;
+    border: 2px solid rgba(201, 162, 39, 0.1);
+    transition: all 0.4s ease;
+    opacity: 0.5;
+}
+
+.highlight-card.active {
+    opacity: 1;
+    border-color: var(--gold);
+    box-shadow: 0 8px 30px rgba(201, 162, 39, 0.15);
+    transform: translateY(-5px);
+}
+
+.highlight-card.dimmed {
+    opacity: 0.3;
+}
+
+.highlight-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.highlight-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: center;
+}
+
+.hl-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+    background: rgba(0,0,0,0.05);
+    color: var(--ink-light);
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.hl-tag.active {
+    background: var(--gold);
+    color: white;
+    box-shadow: 0 4px 15px rgba(201, 162, 39, 0.3);
+    transform: scale(1.05);
+}
+
+/* 朝代颜色高亮 */
+.highlight-card[data-era="jin"] .highlight-title { color: var(--jin-color); }
+.highlight-card[data-era="yuan"] .highlight-title { color: var(--yuan-color); }
+.highlight-card[data-era="ming"] .highlight-title { color: var(--ming-color); }
+.highlight-card[data-era="qing"] .highlight-title { color: var(--qing-color); }
+
+.highlight-card[data-era="jin"].active {
+    border-color: var(--jin-color);
+    box-shadow: 0 8px 30px rgba(139, 0, 0, 0.15);
+}
+
+.highlight-card[data-era="yuan"].active {
+    border-color: var(--yuan-color);
+    box-shadow: 0 8px 30px rgba(46, 139, 87, 0.15);
+}
+
+.highlight-card[data-era="ming"].active {
+    border-color: var(--ming-color);
+    box-shadow: 0 8px 30px rgba(25, 25, 112, 0.15);
+}
+
+.highlight-card[data-era="qing"].active {
+    border-color: var(--qing-color);
+    box-shadow: 0 8px 30px rgba(139, 69, 19, 0.15);
+}
+
+/* 朝代颜色标识 */
+.dynasty-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.dynasty-indicator.dynasty-jin { background: var(--jin-color); }
+.dynasty-indicator.dynasty-yuan { background: var(--yuan-color); }
+.dynasty-indicator.dynasty-ming { background: var(--ming-color); }
+.dynasty-indicator.dynasty-qing { background: var(--qing-color); }
+
+/* ============================================
+   形态学小贴士
+   ============================================ */
+.tips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.tip-item {
+    display: flex;
+    gap: 0.8rem;
+    padding: 0.8rem;
+    background: var(--paper);
+    border-radius: 10px;
+    border-left: 3px solid var(--gold);
+    transition: all 0.3s ease;
+}
+
+.tip-item:hover {
+    background: rgba(201, 162, 39, 0.08);
+    transform: translateX(5px);
+}
+
+.tip-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.tip-content {
+    flex: 1;
+}
+
+.tip-content strong {
+    font-size: 0.85rem;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.tip-content p {
+    font-size: 0.75rem;
+    color: var(--ink-light);
+    line-height: 1.5;
+}
+
+/* ============================================
+   石狮展示区域
+   ============================================ */
+.exhibition-area {
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,240,230,0.98) 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid rgba(201, 162, 39, 0.2);
+    box-shadow: 
+        0 10px 40px var(--shadow),
+        inset 0 0 0 1px rgba(201, 162, 39, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 桥栏杆背景 */
+.exhibition-area::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: 
+        linear-gradient(180deg, transparent 0%, rgba(139, 105, 20, 0.05) 100%),
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 80px,
+            rgba(90, 74, 58, 0.1) 80px,
+            rgba(90, 74, 58, 0.1) 82px
+        );
+    pointer-events: none;
+}
+
+/* 统计栏 */
+.stats-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(201, 162, 39, 0.2);
+}
+
+.stats-title {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.5rem;
+    color: var(--ink);
+}
+
+.stats-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--ink-light);
+}
+
+.stats-count span {
+    color: var(--gold);
+    font-weight: 600;
+}
+
+/* 石狮网格 */
+.lion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* 石狮卡片 */
+.lion-card {
+    background: linear-gradient(180deg, var(--paper) 0%, var(--paper-dark) 100%);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.lion-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(201, 162, 39, 0.1) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.lion-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px var(--shadow);
+    border-color: var(--gold);
+}
+
+.lion-card:hover::before {
+    opacity: 1;
+}
+
+.lion-card.dimmed {
+    opacity: 0.3;
+    filter: grayscale(0.8);
+    pointer-events: none;
+}
+
+.lion-card.highlighted {
+    border-color: var(--gold);
+    box-shadow: 
+        0 0 30px var(--glow),
+        0 15px 40px var(--shadow);
+    transform: scale(1.02);
+}
+
+/* 石狮3D展示容器 */
+.lion-3d-container {
+    width: 100%;
+    aspect-ratio: 1;
+    perspective: 800px;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.lion-3d {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease;
+}
+
+.lion-card:hover .lion-3d {
+    transform: rotateY(15deg) rotateX(5deg);
+}
+
+/* 石狮SVG样式 */
+.lion-svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+
+.lion-svg .lion-body {
+    fill: var(--stone);
+    transition: fill 0.3s ease;
+}
+
+.lion-card:hover .lion-svg .lion-body {
+    fill: var(--stone-light);
+}
+
+/* 时代标识 */
+.lion-era {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.lion-era.jin { background: var(--jin-color); }
+.lion-era.yuan { background: var(--yuan-color); }
+.lion-era.ming { background: var(--ming-color); }
+.lion-era.qing { background: var(--qing-color); }
+
+/* ============================================
+   细节探索热点 · 放大镜功能
+   ============================================ */
+.detail-hotspots {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.hotspot {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    transform: translate(-50%, -50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    pointer-events: all;
+    z-index: 20;
+    transition: transform 0.3s ease;
+}
+
+.hotspot:hover,
+.hotspot.active {
+    transform: translate(-50%, -50%) scale(1.2);
+}
+
+.hotspot-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px rgba(201, 162, 39, 0.8);
+    animation: hotspotPulse 2s ease-in-out infinite;
+}
+
+.hotspot-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    animation: hotspotRing 2s ease-in-out infinite;
+    animation-delay: 0.5s;
+}
+
+.hotspot.active .hotspot-dot {
+    background: white;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
+}
+
+.hotspot.active .hotspot-ring {
+    border-color: white;
+    opacity: 0.8;
+}
+
+@keyframes hotspotPulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 0.7;
+    }
+}
+
+@keyframes hotspotRing {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0;
+    }
+    30% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* 浮动详情标签 */
+.detail-popup {
+    position: absolute;
+    min-width: 180px;
+    max-width: 220px;
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(201, 162, 39, 0.2);
+    z-index: 100;
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.detail-popup.active {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: all;
+}
+
+.detail-popup::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--jin-color), var(--gold), var(--gold));
+}
+
+.detail-popup.jin-popup::before {
+    background: linear-gradient(90deg, var(--jin-color), #a52a2a);
+}
+
+.detail-popup.yuan-popup::before {
+    background: linear-gradient(90deg, var(--yuan-color), #3cb371);
+}
+
+.detail-popup.ming-popup::before {
+    background: linear-gradient(90deg, var(--ming-color), #4169e1);
+}
+
+.detail-popup.qing-popup::before {
+    background: linear-gradient(90deg, var(--qing-color), #a0522d);
+}
+
+.popup-content {
+    padding: 1rem;
+}
+
+.popup-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.popup-icon {
+    width: 24px;
+    height: 24px;
+    background: var(--gold);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.popup-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.popup-desc {
+    font-size: 0.8rem;
+    color: var(--ink-light);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* 石狮信息 */
+.lion-info {
+    text-align: center;
+}
+
+.lion-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+}
+
+.lion-pose {
+    font-size: 0.75rem;
+    color: var(--ink-light);
+}
+
+/* 风格标签 */
+.style-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.style-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    padding: 0.2rem 0.5rem;
+    background: rgba(201, 162, 39, 0.15);
+    color: var(--bronze);
+    border-radius: 10px;
+}
+
+/* ============================================
+   石狮详情浮层
+   ============================================ */
+.detail-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 26, 26, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+}
+
+.detail-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.detail-content {
+    background: var(--paper);
+    width: 100%;
+    max-width: 1300px;
+    max-height: 90vh;
+    border-radius: 20px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    transform: translateY(30px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 30px 100px rgba(0,0,0,0.5),
+        inset 0 0 0 3px var(--gold);
+}
+
+.detail-overlay.active .detail-content {
+    transform: translateY(0) scale(1);
+}
+
+/* 关闭按钮 */
+.detail-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--paper);
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: var(--paper);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.detail-close:hover {
+    background: var(--paper);
+    color: var(--ink);
+    transform: rotate(90deg);
+}
+
+/* 左侧特写区域 */
+.detail-gallery {
+    background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.detail-gallery::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(201, 162, 39, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(201, 162, 39, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.lion-closeup {
+    width: 80%;
+    max-width: 350px;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+    transition: transform 0.3s ease;
+}
+
+.lion-closeup:hover {
+    transform: scale(1.05) rotate(3deg);
+}
+
+/* 标注点 */
+.annotation-marker {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    background: var(--gold);
+    border: 2px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: var(--ink);
+    transition: all 0.3s ease;
+    animation: pulse 2s infinite;
+}
+
+.annotation-marker:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 20px var(--glow);
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.5); }
+    50% { box-shadow: 0 0 0 10px rgba(201, 162, 39, 0); }
+}
+
+/* 标注说明 */
+.annotation-tooltip {
+    position: absolute;
+    background: var(--paper);
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--gold);
+    font-size: 0.8rem;
+    max-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    z-index: 5;
+}
+
+.annotation-marker:hover + .annotation-tooltip,
+.annotation-tooltip:hover {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 画廊导航 */
+.gallery-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.gallery-btn {
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.gallery-btn:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+}
+
+.gallery-indicator {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.8);
+}
+
+/* 右侧详情区域 */
+.detail-info {
+    padding: 2rem;
+    overflow-y: auto;
+    max-height: 90vh;
+}
+
+/* 时代与编号 */
+.detail-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.detail-era {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    color: white;
+    text-transform: uppercase;
+}
+
+.detail-era.jin { background: var(--jin-color); }
+.detail-era.yuan { background: var(--yuan-color); }
+.detail-era.ming { background: var(--ming-color); }
+.detail-era.qing { background: var(--qing-color); }
+
+.detail-id {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--ink-light);
+}
+
+.detail-title {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 2rem;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+}
+
+.detail-subtitle {
+    font-size: 1rem;
+    color: var(--ink-light);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed rgba(201, 162, 39, 0.3);
+}
+
+/* 策展人解说 */
+.curator-note {
+    background: linear-gradient(135deg, rgba(201, 162, 39, 0.1) 0%, rgba(139, 105, 20, 0.05) 100%);
+    border-left: 4px solid var(--gold);
+    padding: 1.2rem;
+    border-radius: 0 10px 10px 0;
+    font-size: 0.95rem;
+    line-height: 1.9;
+    color: var(--ink);
+    font-style: italic;
+    position: relative;
+}
+
+.curator-note::before {
+    content: '"';
+    position: absolute;
+    top: -5px;
+    left: 10px;
+    font-size: 3rem;
+    color: var(--gold);
+    opacity: 0.3;
+    font-family: Georgia, serif;
+}
+
+/* 详情区块 */
+.detail-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px dashed rgba(201, 162, 39, 0.3);
+}
+
+.detail-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title::before {
+    content: '';
+    width: 25px;
+    height: 2px;
+    background: var(--gold);
+}
+
+.detail-text {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--ink-light);
+}
+
+/* 特征列表 */
+.feature-list {
+    list-style: none;
+    margin-top: 1rem;
+}
+
+.feature-item {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
+    color: var(--ink-light);
+    align-items: flex-start;
+}
+
+.feature-icon {
+    color: var(--gold);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+}
+
+.feature-text strong {
+    color: var(--ink);
+}
+
+/* 历史语境 */
+#historyContext {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--ink-light);
+    background: var(--paper-dark);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+/* 迷你时间线 */
+.timeline-mini {
+    position: relative;
+    padding-left: 1rem;
+}
+
+.timeline-mini::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--gold), var(--rust));
+}
+
+.timeline-mini-item {
+    position: relative;
+    padding: 0.5rem 0 0.5rem 1rem;
+}
+
+.timeline-mini-item::before {
+    content: '';
+    position: absolute;
+    left: -0.4rem;
+    top: 0.8rem;
+    width: 6px;
+    height: 6px;
+    background: var(--ink-light);
+    border-radius: 50%;
+}
+
+.timeline-mini-item.current::before {
+    background: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.3);
+}
+
+.timeline-mini-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--gold);
+}
+
+.timeline-mini-desc {
+    font-size: 0.8rem;
+    color: var(--ink-light);
+    margin-top: 0.2rem;
+}
+
+/* 对比展示 */
+.comparison-section {
+    margin-top: 1.5rem;
+}
+
+.comparison-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--ink-light);
+    margin-bottom: 1rem;
+}
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.comparison-item {
+    background: var(--paper-dark);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.comparison-item:hover {
+    border-color: var(--gold);
+    transform: translateY(-3px);
+}
+
+.comparison-item.current {
+    border-color: var(--gold);
+    background: rgba(201, 162, 39, 0.1);
+}
+
+.comparison-img {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 0.5rem;
+}
+
+.comparison-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--ink);
+}
+
+.comparison-era {
+    font-size: 0.7rem;
+    color: var(--ink-light);
+}
+
+/* ============================================
+   底部策展结语
+   ============================================ */
+.curator-conclusion {
+    background: linear-gradient(135deg, var(--ink) 0%, rgba(26, 26, 26, 0.95) 100%);
+    padding: 5rem 2rem;
+    margin-top: 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.curator-conclusion::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(201, 162, 39, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(201, 162, 39, 0.05) 0%, transparent 40%);
+    pointer-events: none;
+}
+
+.conclusion-content {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.conclusion-title {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 2.5rem;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+}
+
+.conclusion-text {
+    font-size: 1rem;
+    line-height: 2;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 1.5rem;
+}
+
+.conclusion-quote {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    font-style: italic;
+    line-height: 2;
+    padding: 1.5rem;
+    border-left: 3px solid var(--gold);
+    background: rgba(201, 162, 39, 0.1);
+    border-radius: 0 10px 10px 0;
+}
+
+/* ============================================
+   响应式设计
+   ============================================ */
+@media (max-width: 1200px) {
+    .main-content {
+        grid-template-columns: 250px 1fr;
+        gap: 1.5rem;
+    }
+    
+    .dynasty-timeline {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar {
+        position: static;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .filter-section {
+        flex: 1;
+        min-width: 200px;
+        margin-bottom: 0;
+    }
+    
+    .filter-options {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .filter-option {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .detail-content {
+        grid-template-columns: 1fr;
+        max-height: 95vh;
+    }
+    
+    .detail-gallery {
+        min-height: 300px;
+    }
+    
+    .detail-info {
+        max-height: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2.5rem;
+    }
+    
+    .nav-links {
+        display: none;
+    }
+    
+    .lion-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .comparison-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .stats-bar {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .dynasty-timeline {
+        grid-template-columns: 1fr;
+    }
+    
+    .conclusion-title {
+        font-size: 2rem;
+    }
+}
+
+/* ============================================
+   动画效果
+   ============================================ */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.lion-card {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.lion-card:nth-child(1) { animation-delay: 0.05s; }
+.lion-card:nth-child(2) { animation-delay: 0.1s; }
+.lion-card:nth-child(3) { animation-delay: 0.15s; }
+.lion-card:nth-child(4) { animation-delay: 0.2s; }
+.lion-card:nth-child(5) { animation-delay: 0.25s; }
+.lion-card:nth-child(6) { animation-delay: 0.3s; }
+.lion-card:nth-child(7) { animation-delay: 0.35s; }
+.lion-card:nth-child(8) { animation-delay: 0.4s; }
+.lion-card:nth-child(9) { animation-delay: 0.45s; }
+.lion-card:nth-child(10) { animation-delay: 0.5s; }

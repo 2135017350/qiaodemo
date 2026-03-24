@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js 基础 3D 场景 - 卢沟桥</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            font-family: sans-serif;
+            z-index: 100;
+            pointer-events: none;
+        }
+    </style>
+    <!-- 引入 Import Map 以支持模块化导入 -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="info">
+        <h2>卢沟桥 3D 场景预览</h2>
+        <p>左键旋转 | 中键平移 | 滚轮缩放</p>
+    </div>
+
+    <!-- 核心逻辑 -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // --- 1. 初始化场景 (Scene) ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x111111); // 深灰色背景，类似博物馆暗室
+        // 添加一点雾效，增加深邃感
+        scene.fog = new THREE.Fog(0x111111, 10, 50);
+
+        // --- 2. 初始化相机 (Camera) ---
+        // PerspectiveCamera(视野角度 FOV, 宽高比 Aspect, 近裁剪面 Near, 远裁剪面 Far)
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(10, 10, 10); // 设置相机初始位置
+        camera.lookAt(0, 0, 0);
+
+        // --- 3. 初始化渲染器 (Renderer) ---
+        const renderer = new THREE.WebGLRenderer({ antialias: true }); // 开启抗锯齿
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio); // 适配高分屏
+        renderer.shadowMap.enabled = true; // 开启阴影贴图
+        document.body.appendChild(renderer.domElement);
+
+        // --- 4. 添加光源 (Lights) ---
+        // 环境光：提供基础照明，让暗部不至于全黑
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        // 方向光：模拟阳光，产生投影和立体感
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(5, 10, 7);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        // --- 5. 添加控制器 (Controls) ---
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; // 开启阻尼惯性，操作更平滑
+        controls.dampingFactor = 0.05;
+
+        // --- 6. 添加辅助工具 (Helpers) ---
+        // 网格辅助线 (X轴红色, Y轴绿色, Z轴蓝色)
+        const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
+        scene.add(gridHelper);
+
+        const axesHelper = new THREE.AxesHelper(2);
+        scene.add(axesHelper);
+
+        // --- 7. 添加示例模型 (Placeholder) ---
+        // 这里先用简单的立方体代表未来的卢沟桥模型
+        const geometry = new THREE.BoxGeometry(4, 1, 10); // 长方体模拟桥身
+        const material = new THREE.MeshStandardMaterial({ 
+            color: 0x888888,
+            roughness: 0.5,
+            metalness: 0.1
+        });
+        const bridgeMesh = new THREE.Mesh(geometry, material);
+        bridgeMesh.position.y = 0.5; // 放在网格上方
+        bridgeMesh.castShadow = true;
+        bridgeMesh.receiveShadow = true;
+        scene.add(bridgeMesh);
+
+        // 添加一些“石狮”柱子
+        const lionGeo = new THREE.CylinderGeometry(0.2, 0.2, 2, 16);
+        const lionMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
+        
+        // 随机放置几个石狮
+        for(let i = 0; i < 10; i++) {
+            const lion = new THREE.Mesh(lionGeo, lionMat);
+            lion.position.set(
+                (Math.random() - 0.5) * 4, 
+                1, 
+                (Math.random() - 0.5) * 8
+            );
+            lion.castShadow = true;
+            scene.add(lion);
+        }
+
+        // --- 8. 响应式处理 (Resize) ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- 9. 渲染循环 (Animation Loop) ---
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // 更新控制器（必须调用，否则没有阻尼效果）
+            controls.update();
+            
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
+

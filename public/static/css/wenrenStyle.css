@@ -1,0 +1,134 @@
+﻿
+
+.theClassBox{width:100%;height:auto; background: url(../image/wenrenBg.jpg) repeat-y; background-size: 100% auto; }
+.brH5{display: none;}
+
+:root{
+	--cameraLeft:34;
+	--cameraTop:0;
+	--txt01Op:1;
+	--txt02Op:0;
+	--renTop:200px;
+	--shanTop:-200px;
+	--rockeryEmptyTextOP:0;
+	--birdTop:-16em;
+	--birdLeft:20em;
+	--birdWidth:0%;
+}
+
+.cameraBox01{width: 100%;height: 80em;position: relative;}
+.cameraBox01 .introduceFloat{top: 23em;left: 9%;}
+.cameraBox01 .cameraBoxSticky{width: 100%;height: 33em;position: sticky;top: 0;left: 0; overflow: hidden;}
+.cameraBox01 .cameraBoxSticky .camera{ width: 164.90%; height: 33em; position: relative; transform:translate(var(--cameraLeft), var(--cameraTop));background: url(../image/topBg.jpg) no-repeat top center; background-size: 100% auto;}
+.cameraBox01 .cameraBoxSticky img{width: 100%;}
+.cameraBox01 .cameraBoxSticky .rockeryBg{position:absolute;top:0em;left: 9.1%;width:27.28%;transform: translateY(var(--shanTop));}
+.cameraBox01 .cameraBoxSticky .treeBg{position:absolute;top:1.7em; right: 17.2%;width:72.54%}
+.cameraBox01 .cameraBoxSticky .moonBg{position:absolute;top: 5.6em;right: 14.4%;width: 4%;}
+.cameraBox01 .cameraBoxSticky .characterOne{position:absolute;top:14.86em;left:8.35%;width:16.76%;/*transform: translateY(var(--renTop));*/}
+.cameraBox01 .cameraBoxSticky .entourageBg{position:absolute;top:15.86em;left:4.15%;width:9.32%;/*transform: translateY(var(--renTop));*/}
+
+.cameraBox01 .cameraBoxSticky .birdBg{position:absolute;top:43%;left:36.26%;width:11.25%;}
+.cameraBox01 .cameraBoxSticky .rockeryEmptyText{ position: absolute;top:13em;left: 0;width:60%;text-align: center;color: rgb(255 255 255);z-index: 99; opacity: var(--rockeryEmptyTextOP);}
+.cameraBox01 .cameraBoxSticky .rockeryEmptyText p{font-size:.7em;line-height: 1.2em;text-align: center; text-shadow:0px 0px 16px rgba(8,33,58,1);}
+.cameraBox01 .cameraBoxSticky .rockeryEmptyText p img{ width:9.5em;}
+
+.cameraBox02 { background: url(../image/topBg02.jpg) no-repeat top center; background-size: 100% auto;margin-top: -11em; }
+.cameraBox02 .topBox{position:relative;width:100%; height: 45em;}
+.cameraBox02 .topBox .birdBg{position:absolute;z-index: 2;width:var(--birdWidth);top:13.5%;left:8.06%; transform: translate(var(--birdLeft),var(--birdTop))}/*20em,-15em width:7.25%;top:21%;left:8.06%;*/
+.cameraBox02 .topBox .pineBg{position:absolute;bottom:0em;left:0;width:100%;transform: translateY(50%);}
+.cameraBox02 .topBox .treeBird{position:absolute;top:20%;left:5%;width:7.43%; display: none;}
+.cameraBox02 .topBox .rigthStoneTable{position:absolute;top:54%;right:0;width:49.52%;transform: translateY(20%);}
+.cameraBox02 .topBox .leftTopTree{position:absolute;top:-2em;left:0;width:40.52%;transform: translateY(10%);}
+.cameraBox02 .topBox .leftTopTree .gif{position: absolute;left: 20%;top: 42%;width: 100%;z-index: -1;}
+.cameraBox02 .topBox .stoneTableText{position:absolute;top:5em;right:3%;width:50%;text-align:center;transform: translateY(150px);}
+.cameraBox02 .topBox .stoneTableText h3{ font-size: .8em; line-height: 1.9em; color: #000000; font-weight: normal; padding-bottom: 0;}
+.cameraBox02 .topBox .stoneTableText h3 img{margin:0 auto;width: 7em;}
+.cameraBox02 .topBox .stoneTableText p{text-align: left; font-size: .42em; line-height: 1.4em; color: #000000;}
+.cameraBox02 .topBox .stoneTable{position:absolute;top:2em;left:0;width:100%;transform: translateY(200px);}
+.cameraBox02 .topBox .people{position:absolute;top:22%;left:39.74%;width:59.86%;transform: translateY(200px);/*16.5%transform: translateY(150px);*/}
+.cameraBox02 .topBox .grass .grass01{position:absolute;bottom:32.5%;left:40.74%;width:15.94%}
+.cameraBox02 .topBox .grass .grass02{position:absolute;top:45.55%;right:0%;width:21.78%}
+.cameraBox02 .introduceFloat{position:absolute;top:43.3%;left:63.77%;width:4.48%}
+.cameraBox02 .topBox img{width:100%; display: block;}
+
+
+.cameraBox03{ height: 41.5em;position:relative; margin-top: -9.5em; padding-top:25em;}
+.cameraBox03 .cameraBox03Top{position: absolute;bottom: 60vh;width: 100%;}
+.cameraBox03 .tingqingtu{ width:76.08%; padding-left:12%;}
+.cameraBox03 .tingqingtuTxt{ width: 28.82%; position: absolute; left: 7%; top: 8em;opacity: 0;}
+.cameraBox03 .tingqingtuTxt h3{ width: 2.0em; margin: 0 auto;}
+.cameraBox03 .tingqingtuTxt img{ width: 100%;}
+.cameraBox03 .renwuTxt{width:29%;position: absolute;left:1.5%;top: 2.5em;}
+.cameraBox03 .renwuTxt .txt01{ /*display: block;*/position: absolute;left:0;top:0;opacity: var(--txt01Op);}
+.cameraBox03 .renwuTxt .txt02{ /*display: none;*/position: absolute;left:0;top:0;opacity: var(--txt02Op);}
+.cameraBox03 p{font-size: .42em; line-height: 1.2em; color: #000000;}
+
+.cameraBox03 .cameraBox03Bot{ background: url(../image/part3Bg.png) no-repeat bottom center; position: sticky; top:0; left: 0; height: 100vh; background-size: 100% auto; }
+.cameraBox03 .renwu{ width: 57.54%;height: 94vh;top: 6vh;left: 20.8%;position: absolute;}
+.cameraBox03 .renwu .renwuImg{ width: 100% !important; height: 100% !important;}
+.cameraBox03 .renwu .shizi{ width: 45.49%; position: absolute; bottom:2.2em; left:28%; z-index:1;opacity: var(--txt01Op);}
+.cameraBox03 .renwu img{ width: 100%; display: block;}
+.cameraBox03 .renwu .shu{cursor: pointer;position: absolute;width: 9%;top: -1em;right: 17%;z-index: 5;height: 6em;}
+.cameraBox03 .renwu .renwuTop{position: absolute;width: 44.54%;top: 0;left: 35%;z-index: 4;}
+.cameraBox03 .renwu .renwuTop .ren{cursor: pointer;position: absolute;width: 48%;height:8em;top: 0;left: 35%;z-index: 5;}
+.cameraBox03 .renwu .renwuTop .qin{cursor: pointer;position: absolute;width: 65%;height: 0.9em;top: 4em;left: 27%;z-index: 6;}
+.cameraBox03 .renwu .renwuRight{ cursor: pointer; position: absolute;width:27.76%;top: 38%;right:0%;z-index: 3; height: 7em;}
+.cameraBox03 .renwu .renwuBottom{ cursor: pointer;position: absolute;width: 30%;bottom: 0;left:37.75%;z-index: 9; height: 5em;}
+.cameraBox03 .renwu .renwuLeft{cursor: pointer; position: absolute;width: 32.9%;top:27%;left: 0;z-index: 1;height:7em;}
+.cameraBox03 .renwu .introduceFloat{bottom:1em; left:2em;}
+.cameraBox03 .renwu .Seeking01{ top: 47%;left: 60%;}
+
+.cameraBox03 .renwuBubble .bubbleBg{ pointer-events: none;background-color: rgba(21,51,54,.8); position: absolute; z-index:8;padding:.7em .6em; width: 5em; border-radius: .2em; top: 1.2em; }
+.cameraBox03 .renwuBubble .bubbleBg p{ color: #fff;}
+.cameraBox03 .renwuBubble .shuBubble{right: -3em;display: none;}
+.cameraBox03 .renwuBubble .renBubble{ width: 6em;left: 2.2em;display: none;}
+.cameraBox03 .renwuBubble .renBubble img{ width: 25%;float: left;padding-right: .2em;display:none;}
+.cameraBox03 .renwuBubble .renBubble p{ }
+.cameraBox03 .renwuBubble .qinBubble{right: -2em;top: 4em;display: none;}
+.cameraBox03 .renwuBubble .RightBubble{right: 4em;top: 4em;display: none;}
+.cameraBox03 .renwuBubble .BottomBubble{pointer-events: none;display: none; width:10.43em; height: 10.43em; border-radius: 50%; position: absolute; bottom: 0; left:22%; background-image: linear-gradient(rgba(79,103,94,1) 40%,rgba(79,103,94,.7) ,rgba(79,103,94,.2));z-index: 8;}
+.cameraBox03 .renwuBubble .BottomBubble p{ width:75%; text-align: left; margin: 0 auto; padding-top: 18%; color: #fff;}
+.cameraBox03 .renwuBubble .LeftBubble{ top: 5.8em;left: -4.5em;display: none;}
+
+.bottomBox{position:relative;width:100%; height:32.65em; background: url(../image/part4Bg.jpg) no-repeat bottom center; background-size: 100% 100%; padding-bottom:1em; margin-top:-0.25em;}
+.bottomBox .part4{ height: 16em;position:relative;}
+.bottomBox .part4 .liuLiTangText{position:absolute;top:0.5em;right:1.41em;width:47%;text-align:center;transform: translateY(70px);}
+.bottomBox .part4 .liuLiTangText h3{font-size: .7em; line-height: 1.9em; color: #000000; font-weight: normal;}
+.bottomBox .part4 .liuLiTangText h3 img{width: 10em;vertical-align: top;display: block;margin: 0 auto 0.5em;}
+.bottomBox .part4 .liuLiTangText p{ font-size: .42em; line-height: 1.4em; color: #000000; text-align: left;}
+.bottomBox .part4 .liuLiTangText p:last-of-type{display: none;}
+.bottomBox .part4 .liuLiTangTree{position:absolute;top:0%;left:0;width:39.06%}
+.bottomBox .part4 .liuLiTangTree .con{ width: 78.85% !important; cursor: pointer;}
+#write{cursor: pointer;}
+.bottomBox .part4 .liuLiTangTree .liuLiTangTreeCur{pointer-events: none;position:absolute;top:0.25em;left:-3.8%;width: 110% !important;;display:none;}
+.bottomBox .part4 .liuLiTangTree p{ width: 45%;font-size: .42em;line-height: 1.2em;color: rgb(0 0 0);position: absolute;left: 68%;bottom: 25em;display:none;}
+.bottomBox .part4 .liuLiTangCharacter{position:absolute;bottom:-5%;right:2.41em;width:43.61%}
+.bottomBox .part4 .liuLiTangCharacter .position{pointer-events: none;display:none;width: .67rem; height: 1.45em; position: absolute;}
+.bottomBox .part4 .liuLiTangCharacter .position img{width: 100%;}
+.bottomBox .part4 .liuLiTangCharacter .position01{right: -1em;top: 2.3em;width: 3.1rem; height: 2.05rem;}
+.bottomBox .part4 .liuLiTangCharacter .position02{left: 46%;top: 0.3em;width: 3.1rem; height: 2.05rem;}
+.bottomBox .part4 .liuLiTangCharacter .position03{top: 2.3em;left: -10%;width: 3.1rem; height: 2.05rem;}
+.bottomBox .part4 .introduceFloat{bottom:11.6%;left:40%;}
+
+.bottomBox .part5{height: 14em;position:relative; margin-top: 0em;}
+.bottomBox .part5 .partyText{position:absolute;top:1.8em;left:0%;width:100%;text-align:center;transform: translateY(150px);}
+.bottomBox .part5 .partyText h3{ font-size: .7em; line-height: 1.9em; color: #fff; font-weight: normal; }
+.bottomBox .part5 .partyText h3 img{ width: 11em; display: block;margin: 0 auto;}
+.bottomBox .part5 .partyText p{ font-size: .42em; line-height: 1.4em; color: #fff; width: 65%; margin: 0 auto;}
+.bottomBox .part5 .partyLeft{position:absolute;bottom:0%;left:5.97%;width:40.14%;transition:all 1s;-webkit-transition:all 1s;}
+.bottomBox .part5 .partyRight{position:absolute;bottom:0%;left:48.06%;width:46.08%;transition:all 1s;-webkit-transition:all 1s;}
+.bottomBox .part5 .introduceFloat{position:absolute;bottom:-10%;left:86.77%;width:4.48%}
+
+
+
+
+
+
+.CN .cameraBox02 .topBox .stoneTableText{top:6.5em;}
+.CN .cameraBox02 .topBox .stoneTableText p{line-height: 1.88em;}
+.CN .cameraBox03 p{line-height: 1.88em;}
+.CN .bottomBox .part4 .liuLiTangText p{line-height: 1.88em;}
+.CN .bottomBox .part5 .partyText p{line-height: 1.88em;}
+.CN .bottomBox .part4 .liuLiTangTree p{line-height: 1.88em;}
+.CN .cameraBox02 .topBox .stoneTableText h3{ padding-bottom:0.5em;}
+.CN .bottomBox .part5 .partyText h3{margin-bottom: 0.5em;}
