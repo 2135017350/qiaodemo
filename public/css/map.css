@@ -172,8 +172,12 @@ nav {
     position: absolute;
     top: 0;
     left: 0;
+    /* Bug Fix #4: 使用 width/height 100% 让 CSS 自动缩放 canvas 显示尺寸
+       canvas 的逻辑像素尺寸（canvas.width/height）在 JS 中与视频一致
+       CSS 负责将其拉伸到容器大小，保证骨架绘制位置与视频画面对齐 */
     width: 100%;
-    height: 300px;
+    height: 100%;
+    max-height: 300px;
     pointer-events: none;
 }
 
