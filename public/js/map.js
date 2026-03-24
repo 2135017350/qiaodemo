@@ -100,8 +100,13 @@ async function startCamera() {
     ctx = canvas.getContext('2d');
 
     try {
+        // Bug Fix #8: 修改摄像头约束条件，使用 ideal 而非 exact，增加设备兼容性
         const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { width: 640, height: 480, facingMode: 'user' } 
+            video: { 
+                width: { ideal: 640 }, 
+                height: { ideal: 480 }, 
+                facingMode: 'user' 
+            } 
         });
         video.srcObject = stream;
         video.play();
@@ -136,6 +141,11 @@ async function initHandPose() {
             return;
         }
 
+        // Bug Fix #9: 检查 handpose 库是否已加载，支持多种加载方式
+        if (typeof handpose === 'undefined') {
+            throw new Error('Handpose 库未加载，请检查网络连接');
+        }
+
         handModel = await handpose.load();
         cachedHandModel = handModel;
         document.getElementById('gesture-status').textContent = '手势控制: 开启';
@@ -144,6 +154,10 @@ async function initHandPose() {
     } catch (err) {
         console.error('手势模型加载失败:', err);
         document.getElementById('gesture-status').textContent = '模型加载失败，请检查网络';
+        // Bug Fix #9: 降级处理，禁用手势控制但不中断应用
+        gestureEnabled = false;
+        document.getElementById('gesture-toggle').disabled = true;
+        document.getElementById('gesture-toggle').title = '手势模型加载失败';
     }
 }
 
