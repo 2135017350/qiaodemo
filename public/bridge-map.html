@@ -5,15 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>桥韵中华 - 桥梁地图</title>
     <link rel="stylesheet" href="./css/map.css">
-    <!-- 百度地图 -->
-    <script type="text/javascript" src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=axsFrFPnexU0a1m6VKYwAQ6BLPuhfvKj"></script>
-    <!-- TensorFlow.js Handpose CDN 引用 -->
+    <!-- Bug Fix #11: 优化百度地图异步加载，避免 document.write 阻塞 -->
+    <script>
+        window.baiduMapReady = false;
+        window.onBaiduMapReady = function() {
+            window.baiduMapReady = true;
+            console.log('百度地图加载完成');
+        };
+    </script>
+    <script async src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=axsFrFPnexU0a1m6VKYwAQ6BLPuhfvKj&callback=onBaiduMapReady"></script>
+    
+    <!-- Bug Fix #11: 使用国内镜像加载 TensorFlow.js 和手势识别模型 -->
     <!-- TensorFlow.js Core -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.0.0"></script>
     <!-- TensorFlow.js Converter -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@4.0.0"></script>
-    <!-- MediaPipe Handpose -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/hands.js"></script>
     <!-- Handpose 库 -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose@0.0.7/dist/handpose.js"></script>
 </head>

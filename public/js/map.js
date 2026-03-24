@@ -11,6 +11,15 @@ let cachedHandModel = null;
 const BAIDU_MAP_AK = 'axsFrFPnexU0a1m6VKYwAQ6BLPuhfvKj';
 
 function initMap() {
+    // Bug Fix #11: 检查百度地图是否已经加载
+    if (typeof BMapGL === 'undefined') {
+        console.warn('[Map] 百度地图库未上段加载，将在 1 秒后重试');
+        setTimeout(initMap, 1000);
+        return;
+    }
+
+    console.log('[Map] 百度地图加载完成，开始初始化地图');
+    
     map = new BMapGL.Map('baidu-map');
     map.centerAndZoom(new BMapGL.Point(105.0, 36.0), 5);
     map.enableScrollWheelZoom(true);
@@ -204,33 +213,47 @@ async function startCamera() {
 async function initHandPose() {
     try {
         document.getElementById('gesture-status').textContent = '加载手势模型...';
+        console.log('[Handpose] 开始加载手势识别模型');
 
         // Bug Fix #7: 复用已缓存的模型，避免重复加载
         if (cachedHandModel) {
             handModel = cachedHandModel;
             document.getElementById('gesture-status').textContent = '手势控制: 开启';
-            console.log('复用已缓存的 Handpose 模型');
+            console.log('[Handpose] 复用已缓存的模型');
             detectHands();
             return;
         }
 
         // Bug Fix #9: 检查 handpose 库是否已加载，支持多种加载方式
         if (typeof handpose === 'undefined') {
+            console.error('[Handpose] 库未定义');
             throw new Error('Handpose 库未加载，请检查网络连接');
         }
 
+        console.log('[Handpose] 库已加载，开始下载模型文件...');
+        
+        // Bug Fix #11: 添加超时控制，防止模型下载无限等待
+        const loadTimeout = setTimeout(() => {
+            console.warn('[Handpose] 模型下载超时（超过30秒），可能是网络问题');
+            document.getElementById('gesture-status').textContent = '模型下载超时，请检查网络';
+            gestureEnabled = false;
+            document.getElementById('gesture-toggle').disabled = true;
+        }, 30000);
+
         handModel = await handpose.load();
+        clearTimeout(loadTimeout);
+        
         cachedHandModel = handModel;
         document.getElementById('gesture-status').textContent = '手势控制: 开启';
-        console.log('Handpose 模型加载成功');
+        console.log('[Handpose] 模型加载成功，开始检测手势');
         detectHands();
     } catch (err) {
-        console.error('手势模型加载失败:', err);
-        document.getElementById('gesture-status').textContent = '模型加载失败，请检查网络';
-        // Bug Fix #9: 降级处理，禁用手势控制但不中断应用
+        console.error('[Handpose] 模型加载失败:', err);
+        document.getElementById('gesture-status').textContent = '模型加载失败: ' + (err.message || '未知错误');
+        // Bug Fix #11: 降级处理，禁用手势控制但不中断应用
         gestureEnabled = false;
         document.getElementById('gesture-toggle').disabled = true;
-        document.getElementById('gesture-toggle').title = '手势模型加载失败';
+        document.getElementById('gesture-toggle').title = '手势模型加载失败: ' + (err.message || '未知错误');
     }
 }
 
@@ -250,7 +273,11 @@ async function detectHands() {
             
             drawHand(landmarks, ctx);
             
-            document.getElementById('gesture-status').textContent = '手势: ' + getGestureName(gesture);
+            const gestureName = getGestureName(gesture);
+            document.getElementById('gesture-status').textContent = '手势: ' + gestureName;
+            
+            // Bug Fix #11: 添加调试日志，帮助诊断手势识别问题
+            console.log('[Gesture] 检测到手势:', gesture, '中文:', gestureName);
 
             handleGesture(gesture);
         } else {
