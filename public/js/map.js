@@ -99,32 +99,105 @@ async function startCamera() {
     canvas = document.getElementById('gesture-canvas');
     ctx = canvas.getContext('2d');
 
-    try {
-        // Bug Fix #8: 修改摄像头约束条件，使用 ideal 而非 exact，增加设备兼容性
-        const stream = await navigator.mediaDevices.getUserMedia({ 
+    // Bug Fix #10: 实现多重回退摄像头启动策略，支持多种设备配置
+    const cameraConstraints = [
+        // 策略 1: 理想配置（前置摄像头，640x480）
+        { 
             video: { 
                 width: { ideal: 640 }, 
                 height: { ideal: 480 }, 
                 facingMode: 'user' 
             } 
-        });
-        video.srcObject = stream;
-        video.play();
+        },
+        // 策略 2: 宽松配置（前置摄像头，无分辨率限制）
+        { 
+            video: { 
+                facingMode: 'user' 
+            } 
+        },
+        // 策略 3: 超宽松配置（任意摄像头，无约束）
+        { 
+            video: true 
+        }
+    ];
+
+    let stream = null;
+    let lastError = null;
+
+    // 尝试多个约束条件，直到成功获取流
+    for (let i = 0; i < cameraConstraints.length; i++) {
+        try {
+            console.log(`尝试摄像头约束方案 ${i + 1}/${cameraConstraints.length}:`, cameraConstraints[i]);
+            stream = await navigator.mediaDevices.getUserMedia(cameraConstraints[i]);
+            console.log('摄像头启动成功，使用约束方案:', cameraConstraints[i]);
+            break;
+        } catch (err) {
+            lastError = err;
+            console.warn(`约束方案 ${i + 1} 失败:`, err.message);
+            // 继续尝试下一个方案
+        }
+    }
+
+    if (!stream) {
+        console.error('所有摄像头启动方案均失败:', lastError);
+        const errorMsg = lastError?.name === 'NotAllowedError' 
+            ? '摄像头权限被拒绝，请在浏览器设置中允许访问摄像头' 
+            : lastError?.name === 'NotFoundError'
+            ? '未找到摄像头设备，请检查硬件连接'
+            : lastError?.name === 'NotReadableError'
+            ? '摄像头被其他应用占用，请关闭其他使用摄像头的程序'
+            : '无法访问摄像头，请检查权限和硬件';
         
+        alert(errorMsg);
+        console.error('摄像头访问失败:', lastError);
+        
+        // Bug Fix #10: 降级处理，禁用手势控制但不中断应用
+        gestureEnabled = false;
+        document.getElementById('gesture-toggle').textContent = '开启手势控制';
+        document.getElementById('gesture-toggle').disabled = true;
+        document.getElementById('gesture-toggle').title = errorMsg;
+        document.getElementById('gesture-status').textContent = '手势控制: 不可用';
+        document.getElementById('gesture-status').classList.remove('active');
+        return;
+    }
+
+    try {
+        video.srcObject = stream;
+        
+        // Bug Fix #10: 使用 play() 的 Promise 处理，避免浏览器兼容性问题
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(err => {
+                console.error('视频播放失败:', err);
+                document.getElementById('gesture-status').textContent = '视频播放失败';
+            });
+        }
+        
+        // Bug Fix #10: 添加超时检查，防止 onloadedmetadata 永不触发
+        const loadTimeout = setTimeout(() => {
+            if (video.videoWidth === 0 || video.videoHeight === 0) {
+                console.warn('视频元数据加载超时，手动初始化');
+                canvas.width = 640;
+                canvas.height = 480;
+                initHandPose();
+            }
+        }, 3000);
+
         video.onloadedmetadata = () => {
+            clearTimeout(loadTimeout);
             // Bug Fix #4: 将 canvas 的逻辑尺寸与视频实际像素尺寸对齐
             // 同时通过 CSS 保证显示尺寸正确（CSS 已设置 width:100%, height:300px）
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
+            console.log(`Canvas 尺寸已设置: ${canvas.width}x${canvas.height}`);
             initHandPose();
         };
     } catch (err) {
-        console.error('摄像头访问失败:', err);
-        alert('无法访问摄像头，请检查权限');
+        console.error('视频流处理失败:', err);
+        document.getElementById('gesture-status').textContent = '视频流处理失败';
         gestureEnabled = false;
         document.getElementById('gesture-toggle').textContent = '开启手势控制';
-        document.getElementById('gesture-status').textContent = '手势控制: 关闭';
-        document.getElementById('gesture-status').classList.remove('active');
+        document.getElementById('gesture-toggle').disabled = true;
     }
 }
 
